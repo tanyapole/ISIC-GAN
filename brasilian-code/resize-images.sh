@@ -46,5 +46,5 @@ cd ..
 
 mkdir "$image_resized"
 cd "$image_resized"
-find ""${BASE_DIR}/$IMAGE_DIR" -name '*.jpg' -exec sh -c 'echo "{}"; convert "{}" -resize 1024x512\> -size 1024x512 xc:black +swap -gravity center -composite `basename "{}" .jpg`.png' \;
+find ${BASE_DIR}/$IMAGE_DIR" -name '*.jpg' -exec sh -c 'echo "{}"; convert "{}" -resize 1024x512\> -size 1024x512 xc:black +swap -gravity center -composite `basename "{}" .jpg`.png' \;
 cd ..
