@@ -7,6 +7,7 @@ then
   exit 1
 fi
 BASE_DIR="${DIR}"
+echo "$BASE_DIR"
 
 while getopts a:s:i: option
 do
