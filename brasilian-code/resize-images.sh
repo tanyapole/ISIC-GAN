@@ -14,9 +14,9 @@ while getopts a:s:i: option
 do
 	case "${option}"
 		in
-		a) ATTRI_DIR=${OPTARG};;
-		s) SEG_DIR=${OPTARG};;
-		i) IMAGE_DIR=${OPTARG};;
+		a) ATTRI_DIR=${BASE_DIR}/${OPTARG};;
+		s) SEG_DIR=${BASE_DIR}/${OPTARG};;
+		i) IMAGE_DIR=${BASE_DIR}/${OPTARG};;
 	esac
 done
 
@@ -33,18 +33,19 @@ echo ""
 echo "attribute_resized: $attribute_resized"
 echo "segmentation_resized: $segmentation_resized"
 echo "image_resized: $image_resized"
+echo ""
 
 mkdir "$attribute_resized"
 cd "$attribute_resized"
-find "${BASE_DIR}/$ATTRI_DIR" -name '*.png' -exec sh -c 'echo "{}"; convert "{}" -resize 1024x512\> -size 1024x512 xc:red +swap -gravity center -composite `basename "{}" .png`.png' \;
+find "$ATTRI_DIR" -name '*.png' -exec sh -c 'echo "{}"; convert "{}" -resize 1024x512\> -size 1024x512 xc:red +swap -gravity center -composite `basename "{}" .png`.png' \;
 cd ..
 
 mkdir "$segmentation_resized"
 cd "$segmentation_resized"
-find "${BASE_DIR}/$SEG_DIR" -name '*.png' -exec sh -c 'echo "{}"; convert "{}" -resize 1024x512\> -size 1024x512 xc:red +swap -gravity center -composite `basename "{}" .png`.png' \;
+find "$SEG_DIR" -name '*.png' -exec sh -c 'echo "{}"; convert "{}" -resize 1024x512\> -size 1024x512 xc:red +swap -gravity center -composite `basename "{}" .png`.png' \;
 cd ..
 
 mkdir "$image_resized"
 cd "$image_resized"
-find "${BASE_DIR}/$IMAGE_DIR" -name '*.jpg' -exec sh -c 'echo "{}"; convert "{}" -resize 1024x512\> -size 1024x512 xc:black +swap -gravity center -composite `basename "{}" .jpg`.png' \;
+find "$IMAGE_DIR" -name '*.jpg' -exec sh -c 'echo "{}"; convert "{}" -resize 1024x512\> -size 1024x512 xc:black +swap -gravity center -composite `basename "{}" .jpg`.png' \;
 cd ..
