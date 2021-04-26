@@ -13,7 +13,7 @@ import glob
 from tqdm import tqdm
 import os
 from joblib import Parallel, delayed
-
+import imageio
 
 def indian_code(base_path):
     # Directories
@@ -39,17 +39,17 @@ def indian_code(base_path):
     def create_instance_map(family):
         # Create a zero filled base image
         # Load original image
-        image = misc.imread(image_dir + family + '.png')
+        image = imageio.imread(image_dir + family + '.png')
         instance_map = np.zeros(image.shape[:2], dtype=int)
         segments = slic(img_as_float(image), n_segments=1000,
                         slic_zero=True, compactness=1, sigma=2)
 
         for i, file in enumerate(glob.glob(atri_dir + family + '*.png')):
             # Read Mask
-            mask = misc.imread(file)
+            mask = imageio.imread(file)
             type_file = file.split('/')[-1].split('_')[3]
             if i == 0:
-                segmentation = misc.imread(segmentation_dir + family + '_segmentation.png', flatten=True)
+                segmentation = imageio.imread(segmentation_dir + family + '_segmentation.png', flatten=True)
                 last_lesion = 2000
                 last_background = 1000
                 for v in np.unique(segments):
