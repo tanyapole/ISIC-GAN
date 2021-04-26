@@ -7,14 +7,13 @@ import matplotlib.pyplot as plt
 from scipy import misc
 import os
 from tqdm import tqdm
-import imageio
 from PIL import Image
 
 import numpy
-import tempfile
 
 from numpy import (amin, amax, ravel, asarray, arange, ones, newaxis,
                    transpose, iscomplexobj, uint8, issubdtype, array)
+
 
 def bytescale(data, cmin=None, cmax=None, high=255, low=0):
     """
@@ -102,12 +101,13 @@ def toimage(arr, high=255, low=0, cmin=None, cmax=None, pal=None,
             cmin = amin(ravel(data))
         if cmax is None:
             cmax = amax(ravel(data))
-        data = (data*1.0 - cmin)*(high - low)/(cmax - cmin) + low
+        data = (data * 1.0 - cmin) * (high - low) / (cmax - cmin) + low
         if mode == 'I':
             data32 = data.astype(numpy.uint32)
             image = Image.frombytes(mode, shape, data32.tostring())
         else:
-            raise ValueError("wht something wrong https://github.com/scipy/scipy/blob/368dbad596a0bd0d5a88a7aec381fdc912440ee1/scipy/misc/pilutil.py#L286-L409")
+            raise ValueError(
+                "wht something wrong https://github.com/scipy/scipy/blob/368dbad596a0bd0d5a88a7aec381fdc912440ee1/scipy/misc/pilutil.py#L286-L409")
         return image
 
     # if here then 3-d array with a 3 or a 4 in the shape length.
@@ -145,7 +145,8 @@ def toimage(arr, high=255, low=0, cmin=None, cmax=None, pal=None,
             mode = 'RGBA'
 
     if mode not in ['RGB', 'RGBA', 'YCbCr', 'CMYK']:
-        raise ValueError("wht something wrong https://github.com/scipy/scipy/blob/368dbad596a0bd0d5a88a7aec381fdc912440ee1/scipy/misc/pilutil.py#L286-L409")
+        raise ValueError(
+            "wht something wrong https://github.com/scipy/scipy/blob/368dbad596a0bd0d5a88a7aec381fdc912440ee1/scipy/misc/pilutil.py#L286-L409")
 
     if mode in ['RGB', 'YCbCr']:
         if numch != 3:
@@ -157,6 +158,43 @@ def toimage(arr, high=255, low=0, cmin=None, cmax=None, pal=None,
     # Here we know data and mode is correct
     image = Image.frombytes(mode, shape, strdata)
     return image
+
+
+def fromimage(im, flatten=False, mode=None):
+    if not Image.isImageType(im):
+        raise TypeError("Input is not a PIL image.")
+
+    if mode is not None:
+        if mode != im.mode:
+            im = im.convert(mode)
+    elif im.mode == 'P':
+        # Mode 'P' means there is an indexed "palette".  If we leave the mode
+        # as 'P', then when we do `a = array(im)` below, `a` will be a 2-D
+        # containing the indices into the palette, and not a 3-D array
+        # containing the RGB or RGBA values.
+        if 'transparency' in im.info:
+            im = im.convert('RGBA')
+        else:
+            im = im.convert('RGB')
+
+    if flatten:
+        im = im.convert('F')
+    elif im.mode == '1':
+        # Workaround for crash in PIL. When im is 1-bit, the call array(im)
+        # can cause a seg. fault, or generate garbage. See
+        # https://github.com/scipy/scipy/issues/2138 and
+        # https://github.com/python-pillow/Pillow/issues/350.
+        #
+        # This converts im from a 1-bit image to an 8-bit image.
+        im = im.convert('L')
+
+    a = array(im)
+    return a
+
+
+def imread(name, flatten=False, mode=None):
+    im = Image.open(name)
+    return fromimage(im, flatten=flatten, mode=mode)
 
 
 def indian_code(base_path):
@@ -176,20 +214,20 @@ def indian_code(base_path):
             file_name_arr.append(file_name)
 
     if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
+        os.makedirs(output_dir, exist_ok=True)
 
     for family in tqdm(file_name_arr):
         # Create a zero filled base image
         for i, file in enumerate(glob.glob(atri_dir + family + '*.png')):
             # Read the image
-            read_image = imageio.imread(file, flatten=True)
+            read_image = imread(file, flatten=True)
             border_color = read_image[0, 0]
             read_image[read_image == border_color] = 0
             read_image[read_image > 0] = 255
             read_image = np.int8(read_image / 255)
 
             if i == 0:
-                mask = imageio.imread(mask_dir + family + '_segmentation.png', flatten=True)
+                mask = imread(mask_dir + family + '_segmentation.png', flatten=True)
                 base_image = np.ones(read_image.shape, dtype=int)  # Healthy Skin is 1
                 border_mask_color = mask[0, 0]
                 base_image[mask == border_mask_color] = 0
@@ -223,6 +261,7 @@ def indian_code(base_path):
             else:
                 print('ERROR: Invalid File Found!!!!')
         toimage(base_image, cmin=0, cmax=255).save(output_dir + family + '_semantic.png')
+
 
 if __name__ == "__main__":
     print(sys.argv)
