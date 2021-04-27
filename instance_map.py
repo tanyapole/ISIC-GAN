@@ -13,7 +13,50 @@ import glob
 from tqdm import tqdm
 import os
 from joblib import Parallel, delayed
-import imageio
+
+
+import numpy
+
+from numpy import (amin, amax, ravel, asarray, arange, ones, newaxis,
+                   transpose, iscomplexobj, uint8, issubdtype, array)
+
+
+def fromimage(im, flatten=False, mode=None):
+    if not Image.isImageType(im):
+        raise TypeError("Input is not a PIL image.")
+
+    if mode is not None:
+        if mode != im.mode:
+            im = im.convert(mode)
+    elif im.mode == 'P':
+        # Mode 'P' means there is an indexed "palette".  If we leave the mode
+        # as 'P', then when we do `a = array(im)` below, `a` will be a 2-D
+        # containing the indices into the palette, and not a 3-D array
+        # containing the RGB or RGBA values.
+        if 'transparency' in im.info:
+            im = im.convert('RGBA')
+        else:
+            im = im.convert('RGB')
+
+    if flatten:
+        im = im.convert('F')
+    elif im.mode == '1':
+        # Workaround for crash in PIL. When im is 1-bit, the call array(im)
+        # can cause a seg. fault, or generate garbage. See
+        # https://github.com/scipy/scipy/issues/2138 and
+        # https://github.com/python-pillow/Pillow/issues/350.
+        #
+        # This converts im from a 1-bit image to an 8-bit image.
+        im = im.convert('L')
+
+    a = array(im)
+    return a
+
+
+def imread(name, flatten=False, mode=None):
+    im = Image.open(name)
+    return fromimage(im, flatten=flatten, mode=mode)
+
 
 def indian_code(base_path):
     # Directories
@@ -39,17 +82,17 @@ def indian_code(base_path):
     def create_instance_map(family):
         # Create a zero filled base image
         # Load original image
-        image = imageio.imread(image_dir + family + '.png')
+        image = imread(image_dir + family + '.png')
         instance_map = np.zeros(image.shape[:2], dtype=int)
         segments = slic(img_as_float(image), n_segments=1000,
                         slic_zero=True, compactness=1, sigma=2)
 
         for i, file in enumerate(glob.glob(atri_dir + family + '*.png')):
             # Read Mask
-            mask = imageio.imread(file)
+            mask = imread(file)
             type_file = file.split('/')[-1].split('_')[3]
             if i == 0:
-                segmentation = imageio.imread(segmentation_dir + family + '_segmentation.png', flatten=True)
+                segmentation = imread(segmentation_dir + family + '_segmentation.png', flatten=True)
                 last_lesion = 2000
                 last_background = 1000
                 for v in np.unique(segments):
