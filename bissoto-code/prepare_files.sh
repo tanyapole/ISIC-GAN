@@ -79,3 +79,7 @@ mv datasets/skin/image_resized datasets/skin/train_img
 cd ..
 python select_train_test.py
 cd pix2pixHD
+
+#########
+
+git reset --hard 2c04be1d9ee76f9c83335547785c6559c1164a29
