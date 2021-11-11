@@ -2,17 +2,17 @@
   
 train_root="/mnt/tank/scratch/nduginets"
 validate_root="/mnt/tank/scratch/nduginets"
-result_dir="/mnt/tank/scratch/nduginets"
-validate_csv="/nfs/home/nduginets/splits/validation.csv"
+result_dir="/mnt/tank/scratch/nduginets/classifiers"
+validate_csv="/nfs/home/nduginets/master-diploma/splits/validation.csv"
 
 DEVICES=$1
 SPLITS=$(echo $2 | tr ";" "\n")
 
 for split in $SPLITS; do
 
-train_csv="/nfs/home/nduginets/splits/baseline/train_${split}.csv"
+train_csv="/nfs/home/nduginets/master-diploma/splits/baseline/train_${split}.csv"
 
-CUDA_VISIBLE_DEVICES=$DEVICES python3 train.py with \
+CUDA_VISIBLE_DEVICES=$DEVICES python3 train.py \
                                 --train_root ${train_root} --train_csv=${train_csv} --epochs=100\
                                 --validate_root=${validate_root} --validate_csv=${validate_csv} --learning_rate 0.001\
                                 --result_dir ${result_dir} --experiment_name "classifier_${split}"
