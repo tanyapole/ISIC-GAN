@@ -48,10 +48,10 @@ class AverageMeter(object):
         self.sum = 0
         self.count = 0
 
-    def update(self, val, n=1):
+    def update(self, val, items_size):
         self.val = val
-        self.sum += val * n
-        self.count += n
+        self.sum += val
+        self.count += items_size
         self.avg = self.sum / self.count
 
 
@@ -103,7 +103,7 @@ def train_epoch(device, model, dataloaders, metric_holder, criterion, optimizer,
                 optimizer.step()
 
         losses.update(loss.item(), inputs.size(0))
-        accuracies.update(torch.sum(outputs == labels).item() / (outputs.shape[0] * outputs.shape[1]))
+        accuracies.update(torch.sum(output_copy == labels).item(), (output_copy.shape[0] * output_copy.shape[1]))
 
         for idx, label_name in enumerate(label_names):
             labels_by_classes[label_name] += list(labels.cpu().data.numpy()[idx, :])
@@ -233,11 +233,11 @@ def main(train_root, train_csv, val_root, val_csv, epochs: int, batch_size: int,
     optimizer = optim.SGD(model.parameters(), lr=lr,
                           momentum=0.9, weight_decay=0.001)
 
-    if val_root is not None:
-        scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.1,
-                                                         min_lr=1e-5, patience=10)
-    else:
-        scheduler = optim.lr_scheduler.MultiStepLR(optimizer,
+    #if val_root is not None:
+    #    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.1,
+    #                                                     min_lr=1e-5, patience=10)
+    #else:
+    scheduler = optim.lr_scheduler.MultiStepLR(optimizer,
                                                    milestones=[25],
                                                    gamma=0.1)
     batches_per_epoch = None
@@ -259,13 +259,13 @@ def main(train_root, train_csv, val_root, val_csv, epochs: int, batch_size: int,
                 batches_per_epoch)
             logging.debug('-' * 40)
 
-        # scheduler.step()
+        scheduler.step()
 
         torch.save(model, last_model_path)
 
 
 if __name__ == "__main__":
-    params = pl.initialize([
+    """params = pl.initialize([
         '--train_root', '/Users/nduginets/Desktop',
         '--train_csv', '/Users/nduginets/PycharmProjects/master-diploma/splits/validation.csv',
         "--validate_root", "/Users/nduginets/Desktop",
@@ -277,6 +277,8 @@ if __name__ == "__main__":
         "--num_workers", "0",  # stupid Mac os!!!!
         "--batch_size", "7"
     ])
+    """
+    params = pl.initialize()
 
     ex_path = os.path.join(params.result_dir, params.experiment_name)
     main(
