@@ -65,4 +65,9 @@ if __name__ == "__main__":
     data_to_csv("ISIC2018_Task1-2_Training_Input",
                 "pix2pix_result/label2skin/test_latest/images/",
                 "/Users/nduginets/Desktop/ISIC2018_Task2_Training_GroundTruth_v3/", # ISIC2018_Task2_Validation_GroundTruth ISIC2018_Task2_Training_GroundTruth_v3
-                "generated/train_{}_{}.csv", ranges, 20)
+                "generated/train_{}_{}.csv", ranges, 50)
+
+    data_to_csv("ISIC2018_Task1-2_Training_Input",
+                "pix2pix_result/label2skin/test_latest/images/",
+                "/Users/nduginets/Desktop/ISIC2018_Task2_Training_GroundTruth_v3/", # ISIC2018_Task2_Validation_GroundTruth ISIC2018_Task2_Training_GroundTruth_v3
+                "generated/train_{}_{}.csv", ranges, 80)
