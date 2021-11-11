@@ -15,7 +15,7 @@ train_csv="/nfs/home/nduginets/master-diploma/splits/generated/train_${split}.cs
 CUDA_VISIBLE_DEVICES=$DEVICES python3 train.py \
                                 --train_root ${train_root} --train_csv=${train_csv} --epochs=100\
                                 --validate_root=${validate_root} --validate_csv=${validate_csv} --learning_rate 0.001\
-                                --result_dir ${result_dir} --experiment_name "classifier_${split}"
+                                --result_dir ${result_dir} --experiment_name "pix_2pix_classifier_${split}"
 done
 
 
