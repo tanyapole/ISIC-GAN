@@ -59,7 +59,7 @@ class AverageMeter(object):
 
 
 def train_epoch(device, model, dataloaders, metric_holder, criterion, optimizer, phase,
-                epoch_number,
+                epoch_number, total_epoch_count,
                 label_names,
                 batches_per_epoch=None):
     losses = AverageMeter()
@@ -79,7 +79,7 @@ def train_epoch(device, model, dataloaders, metric_holder, criterion, optimizer,
             islice(dataloaders['train'], 0, batches_per_epoch),
             total=batches_per_epoch)
     else:
-        tqdm_loader = tqdm(dataloaders[phase])
+        tqdm_loader = tqdm(dataloaders[phase], initial=epoch_number, total=total_epoch_count)
     for data in tqdm_loader:
         (inputs, labels), name = data
 
@@ -246,7 +246,7 @@ def main(train_root, train_csv, val_root, val_csv, epochs: int, batch_size: int,
         logging.debug('train epoch {}/{}'.format(epoch + 1, epochs))
         train_epoch(
             device, model, dataloaders, metric_holder, criterion, optimizer, 'train',
-            epoch,
+            epoch, epochs,
             labels,
             batches_per_epoch)
 
@@ -254,7 +254,7 @@ def main(train_root, train_csv, val_root, val_csv, epochs: int, batch_size: int,
             logging.debug('val epoch {}/{}'.format(epoch + 1, epochs))
             train_epoch(
                 device, model, dataloaders, metric_holder, criterion, optimizer, 'val',
-                epoch,
+                epoch, epochs,
                 labels,
                 batches_per_epoch)
             logging.debug('-' * 40)
