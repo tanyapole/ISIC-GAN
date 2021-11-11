@@ -10,7 +10,7 @@ SPLITS=$(echo $2 | tr ";" "\n")
 
 for split in $SPLITS; do
 
-train_csv="/nfs/home/nduginets/master-diploma/splits/generated/train_${split}.csv"
+train_csv="/nfs/home/nduginets/master-diploma/splits/generated/train_20_${split}.csv"
 
 CUDA_VISIBLE_DEVICES=$DEVICES python3 train.py \
                                 --train_root ${train_root} --train_csv=${train_csv} --epochs=100\
