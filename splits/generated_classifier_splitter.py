@@ -20,7 +20,8 @@ def data_to_csv(real_prefix: str,
                 path: str,
                 dataset_name: str,
                 seeds,
-                replace_first_percents):
+                replace_first_percents,
+                extend):
     masks = glob.glob(path + "*.png")
     names = list(map(lambda x: x.split(path)[1], masks))
     items = list(map(lambda x: x.split("_"), names))
@@ -52,9 +53,16 @@ def data_to_csv(real_prefix: str,
         result = rs.permutation(result)
         indices = list(map(lambda x: x[0], result))
         result = list(map(lambda x: x[1], result))
-        indices_a = list(map(lambda x: os.path.join(generated_prefix, "ISIC_" + x + "_semantic_synthesized_image.jpg"), indices[:part]))
-        indices_b = list(map(lambda x: os.path.join(real_prefix, "ISIC_" + x + ".jpg"),  indices[part:]))
-        indices = indices_a + indices_b
+        if extend:
+            indices_a = list(map(lambda x: os.path.join(generated_prefix, "ISIC_" + x + "_semantic_synthesized_image.jpg"), indices[:part]))
+            indices_b = list(map(lambda x: os.path.join(real_prefix, "ISIC_" + x + ".jpg"),  indices[:part]))
+            indices_c = list(map(lambda x: os.path.join(real_prefix, "ISIC_" + x + ".jpg"), indices[part:]))
+            indices = indices_a + indices_b + indices_c
+            result = result[:part] + result[:part] + result[part:]
+        else:
+            indices_a = list(map(lambda x: os.path.join(generated_prefix, "ISIC_" + x + "_semantic_synthesized_image.jpg"), indices[:part]))
+            indices_b = list(map(lambda x: os.path.join(real_prefix, "ISIC_" + x + ".jpg"),  indices[part:]))
+            indices = indices_a + indices_b
 
         frame = pd.DataFrame(result, index=indices, columns=diseases, dtype='int64')
         frame.to_csv(dataset_name.format(replace_first_percents, seed), index_label="images")
@@ -64,10 +72,15 @@ if __name__ == "__main__":
     ranges = [i for i in range(0, 10)]
     data_to_csv("ISIC2018_Task1-2_Training_Input",
                 "pix2pix_result/label2skin/test_latest/images/",
-                "/Users/nduginets/Desktop/ISIC2018_Task2_Training_GroundTruth_v3/", # ISIC2018_Task2_Validation_GroundTruth ISIC2018_Task2_Training_GroundTruth_v3
-                "generated/train_{}_{}.csv", ranges, 50)
+                "/Users/nduginets/Desktop/images/ISIC2018_Task2_Training_GroundTruth_v3/", # ISIC2018_Task2_Validation_GroundTruth ISIC2018_Task2_Training_GroundTruth_v3
+                "generated/train_1{}_{}.csv", ranges, 20, True)
 
     data_to_csv("ISIC2018_Task1-2_Training_Input",
                 "pix2pix_result/label2skin/test_latest/images/",
-                "/Users/nduginets/Desktop/ISIC2018_Task2_Training_GroundTruth_v3/", # ISIC2018_Task2_Validation_GroundTruth ISIC2018_Task2_Training_GroundTruth_v3
-                "generated/train_{}_{}.csv", ranges, 80)
+                "/Users/nduginets/Desktop/images/ISIC2018_Task2_Training_GroundTruth_v3/", # ISIC2018_Task2_Validation_GroundTruth ISIC2018_Task2_Training_GroundTruth_v3
+                "generated/train_1{}_{}.csv", ranges, 50, True)
+
+    data_to_csv("ISIC2018_Task1-2_Training_Input",
+                "pix2pix_result/label2skin/test_latest/images/",
+                "/Users/nduginets/Desktop/images/ISIC2018_Task2_Training_GroundTruth_v3/", # ISIC2018_Task2_Validation_GroundTruth ISIC2018_Task2_Training_GroundTruth_v3
+                "generated/train_1{}_{}.csv", ranges, 80, True)

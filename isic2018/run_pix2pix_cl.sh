@@ -6,34 +6,17 @@ result_dir="/mnt/tank/scratch/nduginets/classifiers"
 validate_csv="/nfs/home/nduginets/master-diploma/splits/validation.csv"
 
 DEVICES=$1
-SPLITS=$(echo $2 | tr ";" "\n")
+EXTENDED=$2
+SPLITS=$(echo $3 | tr ";" "\n")
 
 for split in $SPLITS; do
-train_csv="/nfs/home/nduginets/master-diploma/splits/generated/train_50_${split}.csv"
+train_csv="/nfs/home/nduginets/master-diploma/splits/generated/train_${EXTENDED}_${split}.csv"
 CUDA_VISIBLE_DEVICES=$DEVICES python3 train.py \
                                 --train_root ${train_root} --train_csv=${train_csv} --epochs=100\
                                 --validate_root=${validate_root} --validate_csv=${validate_csv} --learning_rate 0.001\
-                                --result_dir ${result_dir} --experiment_name "pix_2pix_classifier_50_${split}"
-
-CUDA_VISIBLE_DEVICES=$DEVICES python3 train.py \
-                                --train_root ${train_root} --train_csv=${train_csv} --epochs=100\
-                                --validate_root=${validate_root} --validate_csv=${validate_csv} --learning_rate 0.001\
-                                --result_dir ${result_dir} --experiment_name "pix_2pix_classifier_50_1${split}"
+                                --result_dir ${result_dir} --experiment_name "pix_2pix_classifier_${EXTENDED}_${split}"
 done
 
-
-for split in $SPLITS; do
-train_csv="/nfs/home/nduginets/master-diploma/splits/generated/train_80_${split}.csv"
-CUDA_VISIBLE_DEVICES=$DEVICES python3 train.py \
-                                --train_root ${train_root} --train_csv=${train_csv} --epochs=100\
-                                --validate_root=${validate_root} --validate_csv=${validate_csv} --learning_rate 0.001\
-                                --result_dir ${result_dir} --experiment_name "pix_2pix_classifier_80_${split}"
-
-CUDA_VISIBLE_DEVICES=$DEVICES python3 train.py \
-                                --train_root ${train_root} --train_csv=${train_csv} --epochs=100\
-                                --validate_root=${validate_root} --validate_csv=${validate_csv} --learning_rate 0.001\
-                                --result_dir ${result_dir} --experiment_name "pix_2pix_classifier_80_1${split}"
-done
 
 
 #CUDA_VISIBLE_DEVICES=0 python3 train_comet_csv.py with train_root="/mnt/tank/scratch/nduginets"\

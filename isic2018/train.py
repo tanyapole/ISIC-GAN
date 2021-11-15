@@ -106,10 +106,9 @@ def train_epoch(device, model, dataloaders, metric_holder, criterion, optimizer,
         accuracies.update(torch.sum(output_copy == labels).item(), (output_copy.shape[0] * output_copy.shape[1]))
 
         for idx, label_name in enumerate(label_names):
-            labels_by_classes[label_name] += list(labels.cpu().data.numpy()[idx, :])
-            predicted_by_classes[label_name] += list(output_copy.cpu().data.numpy()[idx, :])
+            labels_by_classes[label_name] += list(labels.cpu().data.numpy()[:, idx])
+            predicted_by_classes[label_name] += list(output_copy.cpu().data.numpy()[:, idx])
         tqdm_loader.set_postfix(loss=losses.avg, acc=accuracies.avg)
-        break
 
     for idx, label_name in enumerate(label_names):
         real = np.array(labels_by_classes[label_name])
@@ -123,11 +122,19 @@ def train_epoch(device, model, dataloaders, metric_holder, criterion, optimizer,
         cm = confusion_matrix(real, predicted)
         result_cell[label_name]['cm'] = cm.tolist()
         result_cell[label_name]['f1_binary'] = f1_score(real, predicted)
-        result_cell[label_name]['f1_micro'] = f1_score(real, predicted, average='micro')
-        result_cell[label_name]['f1_macro'] = f1_score(real, predicted, average='macro')
+
+    real = np.array([])
+    predicted = np.array([])
+    for idx, label_name in enumerate(label_names):
+        real_ = np.array(labels_by_classes[label_name])
+        predicted_ = np.array(predicted_by_classes[label_name])
+        real = np.concatenate((real, real_ * (idx + 1)))
+        predicted = np.concatenate((predicted, predicted_ * (idx + 1)))
 
     result_cell['loss'] = losses.avg
     result_cell['accuracy'] = accuracies.avg
+    result_cell['f1_micro'] = f1_score(real, predicted, average='micro')
+    result_cell['f1_macro'] = f1_score(real, predicted, average='macro')
     meters.add_record(epoch_number, result_cell)
 
 
@@ -265,7 +272,7 @@ def main(train_root, train_csv, val_root, val_csv, epochs: int, batch_size: int,
 
 
 if __name__ == "__main__":
-    """params = pl.initialize([
+    params = pl.initialize([
         '--train_root', '/Users/nduginets/Desktop',
         '--train_csv', '/Users/nduginets/PycharmProjects/master-diploma/splits/validation.csv',
         "--validate_root", "/Users/nduginets/Desktop",
@@ -277,8 +284,8 @@ if __name__ == "__main__":
         "--num_workers", "0",  # stupid Mac os!!!!
         "--batch_size", "7"
     ])
-    """
-    params = pl.initialize()
+
+    # params = pl.initialize()
 
     ex_path = os.path.join(params.result_dir, params.experiment_name)
     main(
