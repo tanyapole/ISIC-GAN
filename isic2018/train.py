@@ -79,7 +79,7 @@ def train_epoch(device, model, dataloaders, metric_holder, criterion, optimizer,
             islice(dataloaders['train'], 0, batches_per_epoch),
             total=batches_per_epoch)
     else:
-        tqdm_loader = tqdm(dataloaders[phase], initial=epoch_number, total=total_epoch_count)
+        tqdm_loader = tqdm(dataloaders[phase])
     for data in tqdm_loader:
         (inputs, labels), name = data
 
@@ -108,7 +108,7 @@ def train_epoch(device, model, dataloaders, metric_holder, criterion, optimizer,
         for idx, label_name in enumerate(label_names):
             labels_by_classes[label_name] += list(labels.cpu().data.numpy()[:, idx])
             predicted_by_classes[label_name] += list(output_copy.cpu().data.numpy()[:, idx])
-        tqdm_loader.set_postfix(loss=losses.avg, acc=accuracies.avg)
+        tqdm_loader.set_postfix(loss=losses.avg, acc=accuracies.avg, epoch=epoch_number)
 
     for idx, label_name in enumerate(label_names):
         real = np.array(labels_by_classes[label_name])
