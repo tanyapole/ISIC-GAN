@@ -70,17 +70,18 @@ def data_to_csv(real_prefix: str,
 
 if __name__ == "__main__":
     ranges = [i for i in range(0, 10)]
-    data_to_csv("images/ISIC2018_Task1-2_Training_Input",
+    """data_to_csv("images/ISIC2018_Task1-2_Training_Input",
                 "pix2pix_result/label2skin/test_latest/images/",
                 "/Users/nduginets/Desktop/images/ISIC2018_Task2_Training_GroundTruth_v3/", # ISIC2018_Task2_Validation_GroundTruth ISIC2018_Task2_Training_GroundTruth_v3
                 "generated/train_1{}_{}.csv", ranges, 20, True)
+    """
 
     data_to_csv("images/ISIC2018_Task1-2_Training_Input",
                 "pix2pix_result/label2skin/test_latest/images/",
                 "/Users/nduginets/Desktop/images/ISIC2018_Task2_Training_GroundTruth_v3/", # ISIC2018_Task2_Validation_GroundTruth ISIC2018_Task2_Training_GroundTruth_v3
-                "generated/train_1{}_{}.csv", ranges, 50, True)
+                "generated/train_{}_{}.csv", ranges, 50, False)
 
     data_to_csv("images/ISIC2018_Task1-2_Training_Input",
                 "pix2pix_result/label2skin/test_latest/images/",
                 "/Users/nduginets/Desktop/images/ISIC2018_Task2_Training_GroundTruth_v3/", # ISIC2018_Task2_Validation_GroundTruth ISIC2018_Task2_Training_GroundTruth_v3
-                "generated/train_1{}_{}.csv", ranges, 80, True)
+                "generated/train_{}_{}.csv", ranges, 80, False)
