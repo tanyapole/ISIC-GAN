@@ -26,15 +26,15 @@ class Dumper:
     def get_formatted_data(self):
         return json.dumps(self.item, indent=4, sort_keys=True)
 
-    def latest_key(self):
+    def latest_key(self, or_default=0):
         keys = list(self.item.keys())
         keys.sort()
-        return keys[-1]
+        return or_default if len(keys) == 0 else keys[-1]
 
 
 if __name__ == "__main__":
-    d = Dumper("ff.json")
-    d.add_record(1, 1488)
-    d.add_record(0, 23)
+    d = Dumper("ff1.json")
+    #d.add_record(1, 1488)
+    #d.add_record(0, 23)
 
     print(d.latest_key())
