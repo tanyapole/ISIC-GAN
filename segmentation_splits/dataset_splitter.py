@@ -13,8 +13,8 @@ def load_mask(path: str) -> int:
     return 1 if np.any(data == 255) else 0
 
 
-def create_record(index, deseases, image_path, mask_path):
-    return [os.path.join(image_path, "ISIC_" + index + ".jpg")] + [
+def create_record(index, deseases, image_path, mask_path, extension=""):
+    return [os.path.join(image_path, "ISIC_" + index + extension + ".jpg")] + [
         os.path.join(mask_path, "ISIC_" + index + "_attribute_" + d + ".png") for d in deseases]
 
 
@@ -52,7 +52,7 @@ def data_to_csv(masks_data_path: str,
         indexes_b = indexes[:part]
         indexes_c = indexes[part:]
 
-        indexes_a = list(map(lambda i: create_record(i, diseases, fake_image_path, masks_path), indexes_a))
+        indexes_a = list(map(lambda i: create_record(i, diseases, fake_image_path, masks_path, "_semantic_synthesized_image"), indexes_a))
         indexes_b = list(map(lambda i: create_record(i, diseases, real_image_path, masks_path), indexes_b))
         indexes_c = list(map(lambda i: create_record(i, diseases, real_image_path, masks_path), indexes_c))
 
