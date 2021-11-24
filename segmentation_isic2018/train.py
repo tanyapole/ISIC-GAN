@@ -126,6 +126,7 @@ def train_epoch(device, model, dataloaders, metric_holder, criterion, optimizer,
                 loss.backward()
                 optimizer.step()
 
+        output_copy = output_copy.to(device)
         losses.update(loss.item(), inputs.size(0))
         accuracies.update(torch.sum(output_copy == labels).item(),
                           (output_copy.shape[0] * output_copy.shape[1] * output_copy.shape[2] * output_copy.shape[3]))
