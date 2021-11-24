@@ -6,6 +6,7 @@ import pretrainedmodels as ptm
 from sklearn.metrics import confusion_matrix, roc_auc_score, f1_score
 import torch
 import torch.nn as nn
+import torchmetrics
 import torch.nn.functional as F
 import torch.optim as optim
 from torch.utils.data import DataLoader, sampler
@@ -22,6 +23,27 @@ import segmentation_models_pytorch as smp
 
 np.set_printoptions(precision=4, suppress=True)
 THRESHOLD = 0.5
+
+# PyTroch version
+
+SMOOTH = 1e-6
+
+
+def iou_pytorch(idx, outputs: torch.Tensor, labels: torch.Tensor):
+    # You can comment out this line if you are passing tensors of equal shape
+    # But if you are passing output from UNet or something it will most probably
+    # be with the BATCH x 1 x H x W shape
+    outputs = outputs[:, idx, :, :]
+    labels = labels[:, idx, :, :]
+
+    intersection = (outputs & labels).float().sum((1, 2))  # Will be zero if Truth=0 or Prediction=0
+    union = (outputs | labels).float().sum((1, 2))  # Will be zzero if both are 0
+
+    iou = (intersection + SMOOTH) / (union + SMOOTH)  # We smooth our devision to avoid 0/0
+
+    thresholded = torch.clamp(20 * (iou - 0.5), 0, 10).ceil() / 10  # This is equal to comparing with thresolds
+
+    return thresholded  # Or thresholded.mean() if you are interested in average across the batch
 
 
 class ModelWithSigmoidOut(nn.Module):
@@ -62,9 +84,12 @@ def train_epoch(device, model, dataloaders, metric_holder, criterion, optimizer,
                 batches_per_epoch=None):
     losses = AverageMeter()
     accuracies = AverageMeter()
+    iou_function = torchmetrics.IoU(num_classes=5)
+    iou_metric = AverageMeter()
     result_cell = {i: {} for i in label_names}
     for name in label_names:
         result_cell[name]['avg'] = AverageMeter()
+        result_cell[name]['iou'] = AverageMeter()
 
     if phase == 'train':
         model.train()
@@ -104,17 +129,29 @@ def train_epoch(device, model, dataloaders, metric_holder, criterion, optimizer,
         losses.update(loss.item(), inputs.size(0))
         accuracies.update(torch.sum(output_copy == labels).item(),
                           (output_copy.shape[0] * output_copy.shape[1] * output_copy.shape[2] * output_copy.shape[3]))
-        tqdm_loader.set_postfix(loss=losses.avg, acc=accuracies.avg, epoch=epoch_number)
+        iou_metric.update(
+            iou_function(torch.tensor(output_copy, dtype=torch.int), torch.tensor(labels, dtype=torch.int)).item(),
+            output_copy.shape[0])
+
+        tqdm_loader.set_postfix(loss=losses.avg, iou=iou_metric.avg, acc=accuracies.avg, epoch=epoch_number)
 
         for idx, label_name in enumerate(label_names):
             cnt = torch.sum(output_copy[:, idx, :, :] == labels[:, idx, :, :]).item()
             count = (output_copy.shape[0] * output_copy.shape[2] * output_copy.shape[3])
             result_cell[label_name]['avg'].update(cnt, count)
 
+            result_cell[label_name]['iou'].update(
+                iou_function(torch.tensor(output_copy[:, idx, :, :], dtype=torch.int),
+                             torch.tensor(labels[:, idx, :, :], dtype=torch.int)).item(), output_copy.shape[0])
+
+
+
     for label_name in label_names:
         result_cell[label_name]['avg'] = result_cell[label_name]['avg'].avg
+        result_cell[label_name]['iou'] = result_cell[label_name]['iou'].avg
     result_cell['loss'] = losses.avg
     result_cell['accuracy'] = accuracies.avg
+    result_cell['iou'] = iou_metric.avg
     meters.add_record(epoch_number, result_cell)
 
 
@@ -246,7 +283,7 @@ def main(train_root, train_csv, val_root, val_csv, epochs: int, batch_size: int,
 
 
 if __name__ == "__main__":
-    """params = pl.initialize([
+    params = pl.initialize([
         '--train_root', '/Users/nduginets/Desktop',
         '--train_csv', '/Users/nduginets/PycharmProjects/master-diploma/segmentation_splits/validation.csv',
         "--validate_root", "/Users/nduginets/Desktop",
@@ -258,9 +295,8 @@ if __name__ == "__main__":
         "--num_workers", "0",  # stupid Mac os!!!!
         "--batch_size", "7"
     ])
-    """
 
-    params = pl.initialize()
+    # params = pl.initialize()
 
     ex_path = os.path.join(params.result_dir, params.experiment_name)
     main(
