@@ -126,12 +126,12 @@ def train_epoch(device, model, dataloaders, metric_holder, criterion, optimizer,
                 loss.backward()
                 optimizer.step()
 
-        output_copy = output_copy.to(device)
         losses.update(loss.item(), inputs.size(0))
         accuracies.update(torch.sum(output_copy == labels).item(),
                           (output_copy.shape[0] * output_copy.shape[1] * output_copy.shape[2] * output_copy.shape[3]))
         iou_metric.update(
-            iou_function(torch.tensor(output_copy, dtype=torch.int), torch.tensor(labels, dtype=torch.int)).item(),
+            iou_function(torch.tensor(output_copy, dtype=torch.int).to("cpu"),
+                         torch.tensor(labels, dtype=torch.int).to("cpu")).item(),
             output_copy.shape[0])
 
         tqdm_loader.set_postfix(loss=losses.avg, iou=iou_metric.avg, acc=accuracies.avg, epoch=epoch_number)
@@ -142,10 +142,8 @@ def train_epoch(device, model, dataloaders, metric_holder, criterion, optimizer,
             result_cell[label_name]['avg'].update(cnt, count)
 
             result_cell[label_name]['iou'].update(
-                iou_function(torch.tensor(output_copy[:, idx, :, :], dtype=torch.int),
-                             torch.tensor(labels[:, idx, :, :], dtype=torch.int)).item(), output_copy.shape[0])
-
-
+                iou_function(torch.tensor(output_copy[:, idx, :, :], dtype=torch.int).to("cpu"),
+                             torch.tensor(labels[:, idx, :, :], dtype=torch.int).to("cpu")).item(), output_copy.shape[0])
 
     for label_name in label_names:
         result_cell[label_name]['avg'] = result_cell[label_name]['avg'].avg
