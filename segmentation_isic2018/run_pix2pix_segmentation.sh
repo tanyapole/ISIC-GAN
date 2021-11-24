@@ -15,7 +15,7 @@ CUDA_VISIBLE_DEVICES=$DEVICES python3 train.py \
                                 --train_root ${train_root} --train_csv=${train_csv} --epochs=100\
                                 --validate_root=${validate_root} --validate_csv=${validate_csv} --learning_rate 0.001\
                                 --result_dir ${result_dir} --experiment_name "pix_2pix_segmentation_${EXTENDED}_${split}"\
-                                --batch_size 5
+                                --batch_size 10
 done
 
 
