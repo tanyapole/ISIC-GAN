@@ -48,10 +48,17 @@ class CSVDatasetWithName(CSVDataset):
     CSVData that also returns image names.
     """
 
-    def __getitem__(self, i):
-        name = self.data.loc[i, self.image_field]
-        return super().__getitem__(i), name
+    def __init__(self, *args, **kwargs):
+        super(CSVDatasetWithName, self).__init__(*args, **kwargs)
+        self.cache = {}
 
+    def __getitem__(self, i):
+        if i in self.cache:
+            return self.cache[i]
+        name = self.data.loc[i, self.image_field]
+        record = super().__getitem__(i), name
+        self.cache[i] = record
+        return record
 
 if __name__ == "__main__":
     dataset = CSVDatasetWithName(
