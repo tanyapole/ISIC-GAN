@@ -239,18 +239,22 @@ def main(train_root, train_csv, val_root, val_csv, epochs: int, batch_size: int,
         'val': dl_val,
     }
 
-    criterion = nn.BCELoss()  # because on single image might be multiple classes
+    train_data = pd.read_csv(train_csv)
+    train_data_cnt = len(train_data)
+    inverse_labels_distribution = torch.tensor([1 - (sum(train_data[l]) / train_data_cnt) for l in labels])
+
+    criterion = nn.BCELoss(inverse_labels_distribution)  # because on single image might be multiple classes
 
     optimizer = optim.SGD(model.parameters(), lr=lr,
                           momentum=0.9, weight_decay=0.001)
 
-    #if val_root is not None:
+    # if val_root is not None:
     #    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.1,
     #                                                     min_lr=1e-5, patience=10)
-    #else:
+    # else:
     scheduler = optim.lr_scheduler.MultiStepLR(optimizer,
-                                                   milestones=[25],
-                                                   gamma=0.1)
+                                               milestones=[25],
+                                               gamma=0.1)
     batches_per_epoch = None
 
     for epoch in epochs_list:
@@ -276,7 +280,7 @@ def main(train_root, train_csv, val_root, val_csv, epochs: int, batch_size: int,
 
 
 if __name__ == "__main__":
-    """params = pl.initialize([
+    params = pl.initialize([
         '--train_root', '/Users/nduginets/Desktop',
         '--train_csv', '/Users/nduginets/PycharmProjects/master-diploma/splits/validation.csv',
         "--validate_root", "/Users/nduginets/Desktop",
@@ -287,9 +291,9 @@ if __name__ == "__main__":
         "--experiment_name", "tmp",
         "--num_workers", "0",  # stupid Mac os!!!!
         "--batch_size", "7"
-    ])"""
+    ])
 
-    params = pl.initialize()
+    # params = pl.initialize()
 
     ex_path = os.path.join(params.result_dir, params.experiment_name)
     main(
