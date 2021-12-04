@@ -3,7 +3,7 @@
 train_root="/mnt/tank/scratch/nduginets"
 validate_root="/mnt/tank/scratch/nduginets"
 result_dir="/mnt/tank/scratch/nduginets/classifiers"
-validate_csv="/nfs/home/nduginets/master-diploma/splits/validation_skin_lession.csv"
+validate_csv="/nfs/home/nduginets/master-diploma/splits/validation_skin_lesion.csv"
 
 DEVICES=$1
 EXTENDED=$2
