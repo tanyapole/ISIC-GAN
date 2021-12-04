@@ -3,18 +3,18 @@
 train_root="/mnt/tank/scratch/nduginets"
 validate_root="/mnt/tank/scratch/nduginets"
 result_dir="/mnt/tank/scratch/nduginets/classifiers"
-validate_csv="/nfs/home/nduginets/master-diploma/splits/validation.csv"
+validate_csv="/nfs/home/nduginets/master-diploma/splits/validation_skin_lession.csv"
 
 DEVICES=$1
 EXTENDED=$2
 SPLITS=$(echo $3 | tr ";" "\n")
 
 for split in $SPLITS; do
-train_csv="/nfs/home/nduginets/master-diploma/splits/generated/train_${EXTENDED}_${split}.csv"
+train_csv="/nfs/home/nduginets/master-diploma/splits/generated_bussio/train_${EXTENDED}_${split}.csv"
 CUDA_VISIBLE_DEVICES=$DEVICES python3 train.py \
                                 --train_root ${train_root} --train_csv=${train_csv} --epochs=100\
                                 --validate_root=${validate_root} --validate_csv=${validate_csv} --learning_rate 0.001\
-                                --result_dir ${result_dir} --experiment_name "weighted_pix_2pix_classifier_${EXTENDED}_${split}"
+                                --result_dir ${result_dir} --experiment_name "bussio_pix_2pix_classifier_${EXTENDED}_${split}"
 done
 
 

@@ -3,19 +3,19 @@
 train_root="/mnt/tank/scratch/nduginets"
 validate_root="/mnt/tank/scratch/nduginets"
 result_dir="/mnt/tank/scratch/nduginets/classifiers"
-validate_csv="/nfs/home/nduginets/master-diploma/splits/validation.csv"
+validate_csv="/nfs/home/nduginets/master-diploma/splits/validation_skin_lession.csv"
 
 DEVICES=$1
 SPLITS=$(echo $2 | tr ";" "\n")
 
 for split in $SPLITS; do
 
-train_csv="/nfs/home/nduginets/master-diploma/splits/baseline/train_${split}.csv"
+train_csv="/nfs/home/nduginets/master-diploma/splits/baseline_bussio/train_${split}.csv"
 
 CUDA_VISIBLE_DEVICES=$DEVICES python3 train.py \
                                 --train_root ${train_root} --train_csv=${train_csv} --epochs=100\
                                 --validate_root=${validate_root} --validate_csv=${validate_csv} --learning_rate 0.001\
-                                --result_dir ${result_dir} --experiment_name "weighted_classifier_${split}"
+                                --result_dir ${result_dir} --experiment_name "bussio_classifier_${split}"
 done
 
 # CUDA_VISIBLE_DEVICES=0 python3 train_comet_train_comet_csv.pycsv.py with train_root="/mnt/tank/scratch/nduginets"\
