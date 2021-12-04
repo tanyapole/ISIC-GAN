@@ -243,7 +243,7 @@ def main(train_root, train_csv, val_root, val_csv, epochs: int, batch_size: int,
     train_data_cnt = len(train_data)
     inverse_labels_distribution = torch.tensor([1 - (sum(train_data[l]) / train_data_cnt) for l in labels]).to(device)
 
-    criterion = nn.BCELoss(inverse_labels_distribution)  # because on single image might be multiple classes
+    criterion = nn.BCELoss() # because on single image might be multiple classes
 
     optimizer = optim.SGD(model.parameters(), lr=lr,
                           momentum=0.9, weight_decay=0.001)
