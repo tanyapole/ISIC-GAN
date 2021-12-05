@@ -29,21 +29,22 @@ THRESHOLD = 0.5
 SMOOTH = 1e-6
 
 
-def iou_pytorch(idx, outputs: torch.Tensor, labels: torch.Tensor):
-    # You can comment out this line if you are passing tensors of equal shape
-    # But if you are passing output from UNet or something it will most probably
-    # be with the BATCH x 1 x H x W shape
+def iou_pytorch(outputs: torch.Tensor, labels: torch.Tensor):
+    intersection = (outputs & labels).float().sum((2, 3))  # Will be zero if Truth=0 or Prediction=0
+    union = (outputs | labels).float().sum((2, 3))  # Will be zzero if both are 0
+    iou = (intersection + SMOOTH) / (union + SMOOTH)  # We smooth our devision to avoid 0/0
+    thresholded = torch.clamp(20 * (iou - 0.5), 0, 10).ceil() / 10  # This is equal to comparing with thresolds
+    return thresholded.mean().item()  # Or thresholded.mean() if you are interested in average across the batch
+
+
+def iou_pytorch_by_class(idx, outputs: torch.Tensor, labels: torch.Tensor):
     outputs = outputs[:, idx, :, :]
     labels = labels[:, idx, :, :]
-
     intersection = (outputs & labels).float().sum((1, 2))  # Will be zero if Truth=0 or Prediction=0
     union = (outputs | labels).float().sum((1, 2))  # Will be zzero if both are 0
-
     iou = (intersection + SMOOTH) / (union + SMOOTH)  # We smooth our devision to avoid 0/0
-
     thresholded = torch.clamp(20 * (iou - 0.5), 0, 10).ceil() / 10  # This is equal to comparing with thresolds
-
-    return thresholded  # Or thresholded.mean() if you are interested in average across the batch
+    return thresholded.mean().item()  # Or thresholded.mean() if you are interested in average across the batch
 
 
 class ModelWithSigmoidOut(nn.Module):
@@ -78,6 +79,15 @@ class AverageMeter(object):
         self.avg = self.sum / self.count
 
 
+def concat(old_tensor, new_tensor):
+    new_tensor.to("cpu")
+    if old_tensor is None:
+        old_tensor = new_tensor
+    else:
+        old_tensor = torch.cat((old_tensor, new_tensor))
+    return old_tensor
+
+
 def train_epoch(device, model, dataloaders, metric_holder, criterion, optimizer, phase,
                 epoch_number, total_epoch_count,
                 label_names,
@@ -104,11 +114,15 @@ def train_epoch(device, model, dataloaders, metric_holder, criterion, optimizer,
             total=batches_per_epoch)
     else:
         tqdm_loader = tqdm(dataloaders[phase])
+
+    int_labels_cat = None
+    output_cat = None
     for data in tqdm_loader:
-        (inputs, labels), name = data
+        (inputs, labels, int_labels), name = data
 
         inputs = inputs.to(device)
         labels = labels.to(device)
+        int_labels = int_labels.to(device)
 
         if phase == 'train':
             optimizer.zero_grad()
@@ -116,7 +130,7 @@ def train_epoch(device, model, dataloaders, metric_holder, criterion, optimizer,
         with torch.set_grad_enabled(phase == 'train'):
             outputs = model(inputs)
 
-            output_copy = torch.zeros_like(outputs)
+            output_copy = torch.zeros_like(outputs, dtype=torch.int)
             output_copy[outputs[:, :, :, :] <= THRESHOLD] = 0
             output_copy[outputs[:, :, :, :] > THRESHOLD] = 1
 
@@ -129,20 +143,24 @@ def train_epoch(device, model, dataloaders, metric_holder, criterion, optimizer,
         losses.update(loss.item(), inputs.size(0))
         accuracies.update(torch.sum(output_copy == labels).item(),
                           (output_copy.shape[0] * output_copy.shape[1] * output_copy.shape[2] * output_copy.shape[3]))
-
-        iou_output = torch.tensor(output_copy, dtype=torch.int).to("cpu")
-        #iou_label = torch.tensor(labels, dtype=torch.int).to("cpu")
-        #iou_metric.update(iou_pytorch(iou_output, iou_label).item(), output_copy.shape[0])
+        # iou_pytorch(0, )
+        # iou_pytorch(output_copy, int_labels)
+        # iou_pytorch_by_class(0, output_copy, int_labels)
+        # iou_output = torch.tensor(output_copy, dtype=torch.int).to("cpu")
+        # iou_label = torch.tensor(labels, dtype=torch.int).to("cpu")
+        # iou_metric.update(iou_pytorch(iou_output, iou_label).item(), output_copy.shape[0])
+        int_labels_cat = concat(int_labels_cat, int_labels)
+        output_cat = concat(output_cat, output_copy)
 
         tqdm_loader.set_postfix(loss=losses.avg, iou=iou_metric.avg, acc=accuracies.avg, epoch=epoch_number)
 
-        for idx, label_name in enumerate(label_names):
-            cnt = torch.sum(output_copy[:, idx, :, :] == labels[:, idx, :, :]).item()
-            count = (output_copy.shape[0] * output_copy.shape[2] * output_copy.shape[3])
-            result_cell[label_name]['avg'].update(cnt, count)
+        # for idx, label_name in enumerate(label_names):
+        #    cnt = torch.sum(output_copy[:, idx, :, :] == labels[:, idx, :, :]).item()
+        #    count = (output_copy.shape[0] * output_copy.shape[2] * output_copy.shape[3])
+        #    result_cell[label_name]['avg'].update(cnt, count)
 
-            result_cell[label_name]['iou'].update(
-                iou_pytorch(iou_output[:, idx, :, :], iou_label[:, idx, :, :]).item(), output_copy.shape[0])
+        #    #result_cell[label_name]['iou'].update(
+        #    #    iou_pytorch(iou_output[:, idx, :, :], iou_label[:, idx, :, :]).item(), output_copy.shape[0])
 
     for label_name in label_names:
         result_cell[label_name]['avg'] = result_cell[label_name]['avg'].avg
@@ -281,21 +299,22 @@ def main(train_root, train_csv, val_root, val_csv, epochs: int, batch_size: int,
 
 
 if __name__ == "__main__":
-    """params = pl.initialize([
-        '--train_root', '/Users/nduginets/Desktop',
-        '--train_csv', '/Users/nduginets/PycharmProjects/master-diploma/segmentation_splits/validation.csv',
-        "--validate_root", "/Users/nduginets/Desktop",
-        "--validate_csv", "/Users/nduginets/PycharmProjects/master-diploma/segmentation_splits/validation.csv",
-        "--epochs", "100",
-        "--learning_rate", "0.001",
-        "--result_dir", "/Users/nduginets/Desktop",
-        "--experiment_name", "tmp",
-        "--num_workers", "0",  # stupid Mac os!!!!
-        "--batch_size", "7"
-    ])
-    """
 
-    params = pl.initialize()
+    if os.path.exists("/Users/nduginets/Desktop"):
+        params = pl.initialize([
+            '--train_root', '/Users/nduginets/Desktop',
+            '--train_csv', '/Users/nduginets/PycharmProjects/master-diploma/segmentation_splits/validation.csv',
+            "--validate_root", "/Users/nduginets/Desktop",
+            "--validate_csv", "/Users/nduginets/PycharmProjects/master-diploma/segmentation_splits/validation.csv",
+            "--epochs", "100",
+            "--learning_rate", "0.001",
+            "--result_dir", "/Users/nduginets/Desktop",
+            "--experiment_name", "tmp",
+            "--num_workers", "0",  # stupid Mac os!!!!
+            "--batch_size", "7"
+        ])
+    else:
+        params = pl.initialize()
 
     ex_path = os.path.join(params.result_dir, params.experiment_name)
     main(

@@ -37,7 +37,8 @@ class CSVDataset(data.Dataset):
             masks.append(img)
 
         masks = torch.cat(masks)
-        return sample, masks
+        int_masks = torch.tensor(masks, dtype=torch.int)
+        return sample, masks, int_masks
 
     def __len__(self):
         return len(self.data)
@@ -50,15 +51,16 @@ class CSVDatasetWithName(CSVDataset):
 
     def __init__(self, *args, **kwargs):
         super(CSVDatasetWithName, self).__init__(*args, **kwargs)
-        self.cache = {}
+        # self.cache = {}
 
     def __getitem__(self, i):
-        if i in self.cache:
-            return self.cache[i]
+        # if i in self.cache:
+        #    return self.cache[i]
         name = self.data.loc[i, self.image_field]
         record = super().__getitem__(i), name
-        self.cache[i] = record
+        # self.cache[i] = record
         return record
+
 
 if __name__ == "__main__":
     dataset = CSVDatasetWithName(

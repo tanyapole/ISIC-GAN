@@ -280,21 +280,21 @@ def main(train_root, train_csv, val_root, val_csv, epochs: int, batch_size: int,
 
 
 if __name__ == "__main__":
-    """params = pl.initialize([
-        '--train_root', '/Users/nduginets/Desktop',
-        '--train_csv', '/Users/nduginets/PycharmProjects/master-diploma/splits/validation.csv',
-        "--validate_root", "/Users/nduginets/Desktop",
-        "--validate_csv", "/Users/nduginets/PycharmProjects/master-diploma/splits/validation.csv",
-        "--epochs", "100",
-        "--learning_rate", "0.001",
-        "--result_dir", "/Users/nduginets/Desktop",
-        "--experiment_name", "tmp",
-        "--num_workers", "0",  # stupid Mac os!!!!
-        "--batch_size", "7"
-    ])
-    """
-
-    params = pl.initialize()
+    if os.path.exists("/Users/nduginets/Desktop"):
+        params = pl.initialize([
+            '--train_root', '/Users/nduginets/Desktop',
+            '--train_csv', '/Users/nduginets/PycharmProjects/master-diploma/splits/validation.csv',
+            "--validate_root", "/Users/nduginets/Desktop",
+            "--validate_csv", "/Users/nduginets/PycharmProjects/master-diploma/splits/validation.csv",
+            "--epochs", "100",
+            "--learning_rate", "0.001",
+            "--result_dir", "/Users/nduginets/Desktop",
+            "--experiment_name", "tmp",
+            "--num_workers", "0",  # stupid Mac os!!!!
+            "--batch_size", "7"
+        ])
+    else:
+        params = pl.initialize()
 
     ex_path = os.path.join(params.result_dir, params.experiment_name)
     main(
