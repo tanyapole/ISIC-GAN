@@ -21,6 +21,8 @@ import logging
 import math
 import segmentation_models_pytorch as smp
 
+from masks_saver import MasksSaver
+
 np.set_printoptions(precision=4, suppress=True)
 THRESHOLD = 0.5
 
@@ -91,16 +93,11 @@ def concat(old_tensor, new_tensor):
 def train_epoch(device, model, dataloaders, metric_holder, criterion, optimizer, phase,
                 epoch_number, total_epoch_count,
                 label_names,
-                batches_per_epoch=None):
+                batches_per_epoch,
+                mask_saver):
     losses = AverageMeter()
     accuracies = AverageMeter()
-    # iou_function = torchmetrics.IoU(num_classes=5)
-    iou_metric = AverageMeter()
     result_cell = {i: {} for i in label_names}
-    for name in label_names:
-        result_cell[name]['avg'] = AverageMeter()
-        result_cell[name]['iou'] = AverageMeter()
-
     if phase == 'train':
         model.train()
         meters = metric_holder['train']
@@ -115,9 +112,11 @@ def train_epoch(device, model, dataloaders, metric_holder, criterion, optimizer,
     else:
         tqdm_loader = tqdm(dataloaders[phase])
 
-    int_labels_cat = None
-    output_cat = None
+    # int_labels_cat = None
+    # output_cat = None
+    idx = 0
     for data in tqdm_loader:
+        idx += 1
         (inputs, labels, int_labels), name = data
 
         inputs = inputs.to(device)
@@ -144,17 +143,16 @@ def train_epoch(device, model, dataloaders, metric_holder, criterion, optimizer,
         accuracies.update(torch.sum(output_copy == labels).item(),
                           (output_copy.shape[0] * output_copy.shape[1] * output_copy.shape[2] * output_copy.shape[3]))
 
-        #int_labels_cat = concat(int_labels_cat, int_labels)
-        #output_cat = concat(output_cat, output_copy)
+        mask_saver.write_masks(idx, int_labels, output_copy)
+        # int_labels_cat = concat(int_labels_cat, int_labels)
+        # output_cat = concat(output_cat, output_copy)
 
-        tqdm_loader.set_postfix(loss=losses.avg, iou=iou_metric.avg, acc=accuracies.avg, epoch=epoch_number)
+        tqdm_loader.set_postfix(loss=losses.avg, acc=accuracies.avg, epoch=epoch_number)
 
-    for label_name in label_names:
-        result_cell[label_name]['avg'] = result_cell[label_name]['avg'].avg
-        result_cell[label_name]['iou'] = result_cell[label_name]['iou'].avg
+    mask_saver.end()
     result_cell['loss'] = losses.avg
     result_cell['accuracy'] = accuracies.avg
-    result_cell['iou'] = iou_metric.avg
+
     meters.add_record(epoch_number, result_cell)
 
 
@@ -265,19 +263,22 @@ def main(train_root, train_csv, val_root, val_csv, epochs: int, batch_size: int,
 
     for epoch in epochs_list:
         logging.debug('train epoch {}/{}'.format(epoch + 1, epochs))
+        train_mask_saver = MasksSaver(experiment_path, "train_{}".format(epoch))
         train_epoch(
             device, model, dataloaders, metric_holder, criterion, optimizer, 'train',
             epoch, epochs,
             labels,
-            batches_per_epoch)
+            batches_per_epoch, train_mask_saver)
 
         if val_root is not None:
+            test_mask_saver = MasksSaver(experiment_path, "test_{}".format(epoch))
+
             logging.debug('val epoch {}/{}'.format(epoch + 1, epochs))
             train_epoch(
                 device, model, dataloaders, metric_holder, criterion, optimizer, 'val',
                 epoch, epochs,
                 labels,
-                batches_per_epoch)
+                batches_per_epoch, test_mask_saver)
             logging.debug('-' * 40)
 
         scheduler.step()
