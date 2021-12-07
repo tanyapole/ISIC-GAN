@@ -80,7 +80,7 @@ class AverageMeter(object):
 
 
 def concat(old_tensor, new_tensor):
-    new_tensor.to("cpu")
+    new_tensor = new_tensor.to("cpu")
     if old_tensor is None:
         old_tensor = new_tensor
     else:
@@ -143,24 +143,11 @@ def train_epoch(device, model, dataloaders, metric_holder, criterion, optimizer,
         losses.update(loss.item(), inputs.size(0))
         accuracies.update(torch.sum(output_copy == labels).item(),
                           (output_copy.shape[0] * output_copy.shape[1] * output_copy.shape[2] * output_copy.shape[3]))
-        # iou_pytorch(0, )
-        # iou_pytorch(output_copy, int_labels)
-        # iou_pytorch_by_class(0, output_copy, int_labels)
-        # iou_output = torch.tensor(output_copy, dtype=torch.int).to("cpu")
-        # iou_label = torch.tensor(labels, dtype=torch.int).to("cpu")
-        # iou_metric.update(iou_pytorch(iou_output, iou_label).item(), output_copy.shape[0])
+
         int_labels_cat = concat(int_labels_cat, int_labels)
         output_cat = concat(output_cat, output_copy)
 
         tqdm_loader.set_postfix(loss=losses.avg, iou=iou_metric.avg, acc=accuracies.avg, epoch=epoch_number)
-
-        # for idx, label_name in enumerate(label_names):
-        #    cnt = torch.sum(output_copy[:, idx, :, :] == labels[:, idx, :, :]).item()
-        #    count = (output_copy.shape[0] * output_copy.shape[2] * output_copy.shape[3])
-        #    result_cell[label_name]['avg'].update(cnt, count)
-
-        #    #result_cell[label_name]['iou'].update(
-        #    #    iou_pytorch(iou_output[:, idx, :, :], iou_label[:, idx, :, :]).item(), output_copy.shape[0])
 
     for label_name in label_names:
         result_cell[label_name]['avg'] = result_cell[label_name]['avg'].avg
