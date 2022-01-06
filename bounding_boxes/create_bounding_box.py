@@ -249,8 +249,7 @@ def union_areas_to_rect(image):
 
         min_j_idx = j_idx.min()
         max_j_idx = j_idx.max()
-        print((img.shape, i_idx.shape, j_idx.shape))
-        color = img[i_idx[0]][j_idx[1]]
+        color = img[i_idx[0]][j_idx[0]]
         class_index.append((cls, color, (min_i_idx, min_j_idx), (max_i_idx, max_j_idx)))
 
     for i in range(len(class_index)):
