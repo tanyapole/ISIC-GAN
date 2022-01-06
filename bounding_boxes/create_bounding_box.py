@@ -280,7 +280,7 @@ def create_bounding_boxes(base_path):
     output_dir = os.path.join(base_path, 'boxes_semantic_map/')
     if not os.path.exists(output_dir):
         os.makedirs(output_dir, exist_ok=True)
-    for file in glob.glob(input_dir + '*.png'):
+    for file in tqdm(glob.glob(input_dir + '*.png')):
         name = file.split('/')[-1]
         read_image = imread(file, flatten=True)
         rect_image = union_areas_to_rect(read_image)
