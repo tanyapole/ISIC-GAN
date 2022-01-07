@@ -7,6 +7,20 @@ BASE_DIR="${DIR}"
 echo "$BASE_DIR"
 echo ""
 
+while getopts a:s:i: option
+do
+	case "${option}"
+		in
+		a) ATTRI_DIR=${BASE_DIR}/${OPTARG};;
+		s) SEG_DIR=${BASE_DIR}/${OPTARG};;
+		i) IMAGE_DIR=${BASE_DIR}/${OPTARG};;
+	esac
+done
+
+echo "Attribute directory: $ATTRI_DIR"
+echo "Segmentation directory: $SEG_DIR"
+echo "Image directory: $IMAGE_DIR"
+echo ""
 
 mkdir "$BASE_DIR/images_512p"
 cd "$BASE_DIR/images_512p"
