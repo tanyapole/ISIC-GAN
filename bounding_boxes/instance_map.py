@@ -127,7 +127,7 @@ def indian_code(base_path):
         im = Image.fromarray(instance_map)
         im.save(output_dir + family + '_instance.png')
 
-    results = Parallel(n_jobs=1)(delayed(create_instance_map)(family) for family in tqdm(file_name_arr))
+    results = Parallel(n_jobs=8)(delayed(create_instance_map)(family) for family in tqdm(file_name_arr))
     print(results)
 
 
