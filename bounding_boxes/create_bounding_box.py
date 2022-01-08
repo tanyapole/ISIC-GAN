@@ -275,23 +275,24 @@ def union_areas_to_rect(image):
     return rectangle_image
 
 
-def create_bounding_boxes(base_path):
-    input_dir = os.path.join(base_path, 'semantic_map/')
-    output_dir = os.path.join(base_path, 'boxes_semantic_map/')
+def create_bounding_boxes(base_path, input_dir, output_dir):
+    input_dir = os.path.join(base_path, input_dir)
+    output_dir = os.path.join(base_path, output_dir)
     if not os.path.exists(output_dir):
         os.makedirs(output_dir, exist_ok=True)
-    for file in tqdm(glob.glob(input_dir + '*.png')):
+    for file in tqdm(glob.glob(os.path.join(input_dir, '*.png'))):
         name = file.split('/')[-1]
         read_image = imread(file, flatten=True)
         rect_image = union_areas_to_rect(read_image)
-        toimage(rect_image, cmin=0, cmax=255).save(output_dir + name)
+        toimage(rect_image, cmin=0, cmax=255).save(os.path.join(output_dir, name))
 
 
 if __name__ == "__main__":
     print(sys.argv)
-    sys.argv = ["c", "/Users/nduginets/PycharmProjects/master-diploma/300img"]
-    if len(sys.argv) != 2:
+    if len(sys.argv) != 4:
         print("expected base data path, got: ", sys.argv)
         exit(1)
     path = sys.argv[1]
-    create_bounding_boxes(path)
+    input_dir = sys.argv[2]
+    output_dir = sys.argv[3]
+    create_bounding_boxes(path, input_dir, output_dir)

@@ -127,13 +127,12 @@ def indian_code(base_path):
         im = Image.fromarray(instance_map)
         im.save(output_dir + family + '_instance.png')
 
-    results = Parallel(n_jobs=8)(delayed(create_instance_map)(family) for family in tqdm(file_name_arr))
+    results = Parallel(n_jobs=1)(delayed(create_instance_map)(family) for family in tqdm(file_name_arr))
     print(results)
 
 
 if __name__ == "__main__":
     print(sys.argv)
-    sys.argv = ["c", "/Users/nduginets/PycharmProjects/master-diploma/300img"]
     if len(sys.argv) != 2:
         print("expected base data path, got: ", sys.argv)
         exit(1)
