@@ -60,9 +60,9 @@ def imread(name, flatten=False, mode=None):
 
 def indian_code(base_path):
     # Directories
-    atri_dir = os.path.join(base_path, 'attribute_512p/')
+    atri_dir = os.path.join(base_path, 'attribute_512p_box/')
     image_dir = os.path.join(base_path, 'images_512p/')
-    segmentation_dir = os.path.join(base_path, 'seg_512p/')
+    segmentation_dir = os.path.join(base_path, 'seg_512p_box/')
     output_dir = os.path.join(base_path, 'instance_map_no_border/')
     print("atri_dir", atri_dir)
     print("image_dir", image_dir)
@@ -73,7 +73,7 @@ def indian_code(base_path):
         os.makedirs(output_dir)
 
     file_name_arr = []
-    for file in glob.glob(atri_dir + '*.png'):
+    for file in glob.glob(atri_dir + '*374*.png'):
         temp = file.split('/')[-1].split('_')
         file_name = temp[0] + '_' + temp[1]
         if file_name not in file_name_arr:

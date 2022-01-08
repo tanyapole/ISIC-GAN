@@ -8,6 +8,7 @@ from scipy import misc
 import os
 from tqdm import tqdm
 from PIL import Image
+from joblib import Parallel, delayed
 
 import numpy
 
@@ -275,16 +276,20 @@ def union_areas_to_rect(image):
     return rectangle_image
 
 
+def im_to_bb(file, output_dir):
+    name = file.split('/')[-1]
+    read_image = imread(file, flatten=True)
+    rect_image = union_areas_to_rect(read_image)
+    toimage(rect_image, cmin=0, cmax=255).save(os.path.join(output_dir, name))
+
+
 def create_bounding_boxes(base_path, input_dir, output_dir):
     input_dir = os.path.join(base_path, input_dir)
     output_dir = os.path.join(base_path, output_dir)
     if not os.path.exists(output_dir):
         os.makedirs(output_dir, exist_ok=True)
-    for file in tqdm(glob.glob(os.path.join(input_dir, '*.png'))):
-        name = file.split('/')[-1]
-        read_image = imread(file, flatten=True)
-        rect_image = union_areas_to_rect(read_image)
-        toimage(rect_image, cmin=0, cmax=255).save(os.path.join(output_dir, name))
+    results = Parallel(n_jobs=8)(delayed(im_to_bb)(file, output_dir) for file in tqdm(glob.glob(os.path.join(input_dir, '*.png'))))
+    print(results)
 
 
 if __name__ == "__main__":
