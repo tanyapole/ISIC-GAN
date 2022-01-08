@@ -289,6 +289,7 @@ def create_bounding_boxes(base_path):
 
 if __name__ == "__main__":
     print(sys.argv)
+    sys.argv = ["c", "/Users/nduginets/PycharmProjects/master-diploma/300img"]
     if len(sys.argv) != 2:
         print("expected base data path, got: ", sys.argv)
         exit(1)
