@@ -48,7 +48,30 @@ find "$IMAGE_DIR" -name '*.jpg' -exec sh -c 'echo "{}"; convert "{}" -resize 102
 
 
 python ~/master-diploma/bounding_boxes/assemble_data.py "$BASE_DIR"
-python ~/master-diploma/bounding_boxes/create_bounding_box.py "$BASE_DIR"
+python ~/master-diploma/bounding_boxes/create_bounding_box.py "$BASE_DIR" semantic_map boxes_semantic_map
+
+mkdir "$BASE_DIR/images_512p"
+cd "$BASE_DIR/images_512p"
+find "$IMAGE_DIR" -name '*jpg' -exec sh -c 'echo "{}"; convert "{}" -resize 1024x512\> `basename "{}" .jpg`.png' \;
+
+
+mkdir "$BASE_DIR/attribute_512p"
+cd "$BASE_DIR/attribute_512p"
+find "$ATTRI_DIR" -name '*.png' -exec sh -c 'echo "{}"; convert "{}" -resize 1024x512 `basename "{}" .png`.png' \;
+python ~/master-diploma/bounding_boxes/create_bounding_box.py "$BASE_DIR" attribute_512p attribute_512p_box
+
+
+mkdir "$BASE_DIR/seg_512p"
+cd "$BASE_DIR/seg_512p"
+find "$SEG_DIR" -name '*.png' -exec sh -c 'echo "{}"; convert "{}" -resize 1024x512 `basename "{}" .png`.png' \;
+python ~/master-diploma/bounding_boxes/create_bounding_box.py "$BASE_DIR" seg_512p seg_512p_box
+
+python ~/master-diploma/bounding_boxes/instance_map.py "$BASE_DIR"
+mkdir "$BASE_DIR/instance_map"
+cd "$BASE_DIR/instance_map"
+find "$BASE_DIR/instance_map_no_border" -name '*.png' -exec sh -c 'echo "{}"; convert "{}" -resize 1024x512\> -size 1024x512 xc:black +swap -gravity center -composite `basename "{}" .png`.png' \;
+
+# todo maybe remove *512p* ???
 
 cd ~/
 git clone https://github.com/NVIDIA/pix2pixHD.git

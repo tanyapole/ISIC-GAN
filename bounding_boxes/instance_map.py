@@ -73,7 +73,7 @@ def indian_code(base_path):
         os.makedirs(output_dir)
 
     file_name_arr = []
-    for file in glob.glob(atri_dir + '*374*.png'):
+    for file in glob.glob(atri_dir + '*.png'):
         temp = file.split('/')[-1].split('_')
         file_name = temp[0] + '_' + temp[1]
         if file_name not in file_name_arr:
