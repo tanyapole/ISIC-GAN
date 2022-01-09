@@ -7,31 +7,18 @@ BASE_DIR="${DIR}"
 echo "$BASE_DIR"
 echo ""
 
-while getopts a:s:i: option
-do
-	case "${option}"
-		in
-		a) ATTRI_DIR=${BASE_DIR}/${OPTARG};;
-		s) SEG_DIR=${BASE_DIR}/${OPTARG};;
-		i) IMAGE_DIR=${BASE_DIR}/${OPTARG};;
-	esac
-done
+mkdir -p "$BASE_DIR/datasets/skin"
+mv "$BASE_DIR/instance_map" "$BASE_DIR/datasets/skin/"
+# todo I changed here from semantic_map to boxes_semantic_map !!!
+mv "$BASE_DIR/boxes_semantic_map" "$BASE_DIR/datasets/skin/"
 
-echo "Attribute directory: $ATTRI_DIR"
-echo "Segmentation directory: $SEG_DIR"
-echo "Image directory: $IMAGE_DIR"
-echo ""
+mkdir -p "$BASE_DIR/datasets/skin/test_label"
+mkdir -p "$BASE_DIR/datasets/skin/test_inst"
+mkdir -p "$BASE_DIR/datasets/skin/test_img"
+mv "$BASE_DIR/datasets/skin/instance_map" "$BASE_DIR/datasets/skin/train_inst"
+# todo I changed here from semantic_map to boxes_semantic_map !!!
+mv "$BASE_DIR/datasets/skin/boxes_semantic_map" "$BASE_DIR/datasets/skin/train_label"
+mv "$BASE_DIR/image_resized" "$BASE_DIR/datasets/skin/"
+mv "$BASE_DIR/datasets/skin/image_resized" "$BASE_DIR/datasets/skin/train_img"
 
-mkdir "$BASE_DIR/images_512p"
-cd "$BASE_DIR/images_512p"
-find "$IMAGE_DIR" -name '*jpg' -exec sh -c 'echo "{}"; convert "{}" -resize 1024x512\> `basename "{}" .jpg`.png' \;
-
-
-mkdir "$BASE_DIR/attribute_512p"
-cd "$BASE_DIR/attribute_512p"
-find "$ATTRI_DIR" -name '*.png' -exec sh -c 'echo "{}"; convert "{}" -resize 1024x512 `basename "{}" .png`.png' \;
-
-
-mkdir "$BASE_DIR/seg_512p"
-cd "$BASE_DIR/seg_512p"
-find "$SEG_DIR" -name '*.png' -exec sh -c 'echo "{}"; convert "{}" -resize 1024x512 `basename "{}" .png`.png' \;
+python ~/master-diploma/select_train_test.py "$BASE_DIR"
