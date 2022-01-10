@@ -21,4 +21,4 @@ mv "$BASE_DIR/datasets/skin/boxes_semantic_map" "$BASE_DIR/datasets/skin/train_l
 mv "$BASE_DIR/image_resized" "$BASE_DIR/datasets/skin/"
 mv "$BASE_DIR/datasets/skin/image_resized" "$BASE_DIR/datasets/skin/train_img"
 
-python ~/master-diploma/select_train_test.py "$BASE_DIR"
+# python ~/master-diploma/select_train_test.py "$BASE_DIR"
