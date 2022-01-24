@@ -13,6 +13,6 @@ writer = SummaryWriter()
 
 
 if __name__ == "__main__":
-    train_data = pd.read_csv(train_csv)
+    train_data = pd.read_csv("")
     train_data_cnt = len(train_data)
     inverse_labels_distribution = torch.tensor([1 - (sum(train_data[l]) / train_data_cnt) for l in labels]).to(device)

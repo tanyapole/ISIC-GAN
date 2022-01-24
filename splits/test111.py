@@ -4,7 +4,7 @@ import numpy as np
 
 def prt(data):
     cnt = len(data)
-
+    print("count", cnt)
     print("streaks", sum(data['streaks']) / cnt)
     print("milia_like_cyst", sum(data['milia_like_cyst']) / cnt)
     print("negative_network", sum(data['negative_network']) / cnt)
@@ -25,7 +25,7 @@ def prt_a():
     print("===" * 50)
     print("===" * 50)
     print("===" * 50)
-    prt(data=pd.read_csv("/Users/nduginets/PycharmProjects/master-diploma/splits/baseline/train_1.csv"))
+    prt(data=pd.read_csv("/Users/nduginets/PycharmProjects/master-diploma/splits/validation_skin_lesion.csv"))
 
 
 def print_distribution():
@@ -41,7 +41,7 @@ def print_distribution():
     prt(data)
 
 if __name__ == "__main__":
-    print_distribution()
+    # print_distribution()
 
     print("===" * 50)
     print("===" * 50)
