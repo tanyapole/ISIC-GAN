@@ -352,7 +352,7 @@ def create_bounding_boxes(base_path, attribute_name, segmentation_name, export_t
 
 
 if __name__ == "__main__":
-    print(sys.argv)
+    """print(sys.argv)
     if len(sys.argv) != 5:
         print("expected base data path, got: ", sys.argv)
         exit(1)
@@ -360,6 +360,7 @@ if __name__ == "__main__":
     attr_dir = sys.argv[2]
     segm_dir = sys.argv[3]
     name = sys.argv[4]
-    create_bounding_boxes(path, attr_dir, segm_dir, name)
-    # create_bounding_boxes("/Users/nduginets/PycharmProjects/master-diploma/GAN_to_box/test_data/0000150",
-    #                       "attribute_512p", "seg_512p", "report.csv")
+    #create_bounding_boxes(path, attr_dir, segm_dir, name)
+    """
+    create_bounding_boxes("/Users/nduginets/PycharmProjects/master-diploma/GAN_to_box/test_data/0000150",
+                           "attribute_512p", "seg_512p", "report.csv")

@@ -24,7 +24,8 @@ def data_to_csv(real_prefix: str,
                 extend,
                 items_to_use):
     masks = glob.glob(path + "*.png")
-    masks = list(filter(lambda x: any([True if i not in x else False for i in items_to_use]), masks))
+    if len(items_to_use) > 0:
+        masks = list(filter(lambda x: any([True if i not in x else False for i in items_to_use]), masks))
     names = list(map(lambda x: x.split(path)[1], masks))
     items = list(map(lambda x: x.split("_"), names))
     codes = list(map(lambda x: x[1], items))
@@ -67,38 +68,18 @@ def data_to_csv(real_prefix: str,
 
 
 if __name__ == "__main__":
-    with open("/Users/nduginets/PycharmProjects/master-diploma/splits/skin_lesion_test.txt", "r") as f:
-        items_to_use = f.readlines()
-        items_to_use = list(map(lambda x: x[:-5], items_to_use))
-
+    #with open("/Users/nduginets/PycharmProjects/master-diploma/splits/skin_lesion_test.txt", "r") as f:
+    #    items_to_use = f.readlines()
+    #    items_to_use = list(map(lambda x: x[:-5], items_to_use))
+    items_to_use = []
     ranges = [i for i in range(0, 10)]
-    data_to_csv("images/ISIC2018_Task1-2_Training_Input",
-                "pix2pix_result/label2skin/test_latest/images/",
-                "/Users/nduginets/Desktop/images/ISIC2018_Task2_Training_GroundTruth_v3/", # ISIC2018_Task2_Validation_GroundTruth ISIC2018_Task2_Training_GroundTruth_v3
-                "generated_bussio/train_{}_{}.csv", ranges, 20, False, items_to_use)
 
     data_to_csv("images/ISIC2018_Task1-2_Training_Input",
                 "pix2pix_result/label2skin/test_latest/images/",
                 "/Users/nduginets/Desktop/images/ISIC2018_Task2_Training_GroundTruth_v3/", # ISIC2018_Task2_Validation_GroundTruth ISIC2018_Task2_Training_GroundTruth_v3
-                "generated_bussio/train_{}_{}.csv", ranges, 50, False, items_to_use)
+                "generated/train_1{}_{}.csv", ranges, 90, True, items_to_use)
 
     data_to_csv("images/ISIC2018_Task1-2_Training_Input",
                 "pix2pix_result/label2skin/test_latest/images/",
                 "/Users/nduginets/Desktop/images/ISIC2018_Task2_Training_GroundTruth_v3/", # ISIC2018_Task2_Validation_GroundTruth ISIC2018_Task2_Training_GroundTruth_v3
-                "generated_bussio/train_{}_{}.csv", ranges, 80, False, items_to_use)
-
-
-    data_to_csv("images/ISIC2018_Task1-2_Training_Input",
-                "pix2pix_result/label2skin/test_latest/images/",
-                "/Users/nduginets/Desktop/images/ISIC2018_Task2_Training_GroundTruth_v3/", # ISIC2018_Task2_Validation_GroundTruth ISIC2018_Task2_Training_GroundTruth_v3
-                "generated_bussio/train_1{}_{}.csv", ranges, 20, True, items_to_use)
-
-    data_to_csv("images/ISIC2018_Task1-2_Training_Input",
-                "pix2pix_result/label2skin/test_latest/images/",
-                "/Users/nduginets/Desktop/images/ISIC2018_Task2_Training_GroundTruth_v3/", # ISIC2018_Task2_Validation_GroundTruth ISIC2018_Task2_Training_GroundTruth_v3
-                "generated_bussio/train_1{}_{}.csv", ranges, 50, True, items_to_use)
-
-    data_to_csv("images/ISIC2018_Task1-2_Training_Input",
-                "pix2pix_result/label2skin/test_latest/images/",
-                "/Users/nduginets/Desktop/images/ISIC2018_Task2_Training_GroundTruth_v3/", # ISIC2018_Task2_Validation_GroundTruth ISIC2018_Task2_Training_GroundTruth_v3
-                "generated_bussio/train_1{}_{}.csv", ranges, 80, True, items_to_use)
+                "generated/train_1{}_{}.csv", ranges, 100, True, items_to_use)
