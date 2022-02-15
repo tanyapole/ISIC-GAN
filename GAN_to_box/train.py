@@ -134,12 +134,12 @@ def train_epoch(device,
         bounding_boxes_data = Variable(data.to(device).type(torch.Tensor))
         batch_size = bounding_boxes_data.shape[0]
 
-        valid = Variable(torch.Tensor(batch_size, 1, device=device).fill_(1.0), requires_grad=False)
-        fake = Variable(torch.Tensor(batch_size, 1, device=device).fill_(0.0), requires_grad=False)
+        valid = Variable(torch.empty(batch_size, 1, device=device).fill_(1.0), requires_grad=False)
+        fake = Variable(torch.empty(batch_size, 1, device=device).fill_(0.0), requires_grad=False)
 
         generator.zero_grad()
 
-        z = Variable(torch.Tensor(np.random.normal(0, 1, (batch_size, 100)), device=device))
+        z = Variable(torch.tensor(np.random.normal(0, 1, (batch_size, 100)), dtype=torch.float, device=device))
         gen_boxes = generator(z)
 
         fake_g_output = discriminator(gen_boxes)
@@ -344,7 +344,7 @@ if __name__ == "__main__":
         params = pl.initialize([
             '--train_csv', path,
             "--validate_csv", path,
-            "--epochs", "200",
+            "--epochs", "400",
             "--result_dir", "/Users/nduginets/Desktop",
             "--experiment_name", "tmp",
             "--num_workers", "0",  # stupid Mac os!!!!
