@@ -12,7 +12,7 @@ parser.add_argument("--batch_size", type=int, help="batch size to process at onc
 parser.add_argument("--num_workers", type=int, help="threads number to load dataset", default=8)
 parser.add_argument("--result_dir", help="base path for all experiments", required=True)
 parser.add_argument("--experiment_name", help="experiment name where all will be storages", required=True)
-
+parser.add_argument("--model_name", default="my")
 
 def __parse_and_get(args=None):
     return parser.parse_args(args)
