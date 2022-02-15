@@ -131,7 +131,7 @@ def train_epoch(device,
         generator.zero_grad()
         discriminator.zero_grad()
 
-        bounding_boxes_data = Variable(data.to(device))
+        bounding_boxes_data = Variable(data.detach().to(device))
         batch_size = data.shape[0]
 
         valid = Variable(torch.empty(batch_size, 1, device=device).fill_(1.0), requires_grad=False)
