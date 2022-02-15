@@ -132,7 +132,7 @@ def train_epoch(device,
         discriminator.zero_grad()
 
         bounding_boxes_data = Variable(data.to(device))
-        batch_size = bounding_boxes_data.shape[0]
+        batch_size = data.shape[0]
 
         valid = Variable(torch.empty(batch_size, 1, device=device).fill_(1.0), requires_grad=False)
         fake = Variable(torch.empty(batch_size, 1, device=device).fill_(0.0), requires_grad=False)
