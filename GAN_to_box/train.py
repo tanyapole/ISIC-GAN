@@ -99,7 +99,6 @@ def train_epoch(device,
                 discriminator: ModelOptimizerHolder,
                 dataloaders,
                 metric_holder,
-                criterion,
                 phase,
                 epoch_number,
                 metadata: DatasetMetadata):
@@ -127,6 +126,9 @@ def train_epoch(device,
         meters = metric_holder['val']
 
     tqdm_loader = tqdm(dataloaders[phase])
+
+    generator_criterion = nn.MSELoss()
+    discriminator_criterion = nn.BCELoss()
     for data in tqdm_loader:
         generator.zero_grad()
         discriminator.zero_grad()
@@ -143,16 +145,16 @@ def train_epoch(device,
         gen_boxes = generator(z)
 
         fake_g_output = discriminator(gen_boxes)
-        g_loss = criterion(fake_g_output, valid)
+        g_loss = discriminator_criterion(fake_g_output, valid)
         g_loss.backward()
         generator.step()
 
         discriminator.zero_grad()
 
         real_d_output = discriminator(bounding_boxes_data)
-        real_loss = criterion(real_d_output, valid)
+        real_loss = discriminator_criterion(real_d_output, valid)
         fake_d_output = discriminator(gen_boxes.detach())
-        fake_loss = criterion(fake_d_output, fake)
+        fake_loss = discriminator_criterion(fake_d_output, fake)
         d_loss = (real_loss + fake_loss) / 2
         d_loss.backward()
         discriminator.step()
@@ -308,7 +310,7 @@ def main(train_csv,
     }
 
     # Initialize BCELoss function
-    criterion = nn.BCELoss()
+    # criterion = nn.BCELoss()
 
     optimizerG = optim.Adam(modelG.parameters(), lr=lr, betas=(beta1, 0.999))
     optimizerD = optim.Adam(modelD.parameters(), lr=lr, betas=(beta1, 0.999))
@@ -326,7 +328,7 @@ def main(train_csv,
 
     for epoch in epochs_list:
         logging.debug('train epoch {}/{}'.format(epoch + 1, epochs))
-        train_epoch(device, gen, discr, dataloaders, metric_holder, criterion, 'train', epoch, dataset_metadata)
+        train_epoch(device, gen, discr, dataloaders, metric_holder, 'train', epoch, dataset_metadata)
 
         # logging.debug('val epoch {}/{}'.format(epoch + 1, epochs))
         # train_epoch(device, gen, discr, dataloaders, metric_holder, criterion, 'val', epoch, dataset_metadata)
