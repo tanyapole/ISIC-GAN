@@ -153,8 +153,10 @@ def train_epoch(device,
 
         real_d_output = discriminator(bounding_boxes_data)
         real_loss = discriminator_criterion(real_d_output, valid)
+
         fake_d_output = discriminator(gen_boxes.detach())
         fake_loss = discriminator_criterion(fake_d_output, fake)
+
         d_loss = (real_loss + fake_loss) / 2
         d_loss.backward()
         discriminator.step()
