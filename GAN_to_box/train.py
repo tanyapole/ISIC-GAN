@@ -140,15 +140,19 @@ def train_epoch(device,
         valid = Variable(torch.empty(batch_size, 1, device=device).fill_(1.0), requires_grad=False)
         fake = Variable(torch.empty(batch_size, 1, device=device).fill_(0.0), requires_grad=False)
 
-        generator.zero_grad()
+        for i in range(10):
+            generator.zero_grad()
+
+            z = Variable(torch.tensor(np.random.normal(0, 1, (batch_size, 100)), dtype=torch.float, device=device))
+            gen_boxes = generator(z)
+
+            fake_g_output = discriminator(gen_boxes)
+            g_loss = discriminator_criterion(fake_g_output, valid)
+            g_loss.backward()
+            generator.step()
 
         z = Variable(torch.tensor(np.random.normal(0, 1, (batch_size, 100)), dtype=torch.float, device=device))
         gen_boxes = generator(z)
-
-        fake_g_output = discriminator(gen_boxes)
-        g_loss = discriminator_criterion(fake_g_output, valid)
-        g_loss.backward()
-        generator.step()
 
         discriminator.zero_grad()
 
