@@ -43,7 +43,7 @@ class Generator(nn.Module):
             *block(256, 512),
             *block(512, 1024),
             nn.Linear(1024, output_size),
-            nn.Sigmoid()
+            nn.Tanh()
         )
 
     def forward(self, z):
@@ -60,7 +60,7 @@ class Discriminator(nn.Module):
             nn.Linear(512, 256),
             nn.LeakyReLU(0.2, inplace=True),
             nn.Linear(256, 1),
-            nn.Tanh(),
+            nn.Sigmoid(),
         )
 
     def forward(self, img):

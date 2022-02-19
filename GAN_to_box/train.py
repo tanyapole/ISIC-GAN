@@ -286,11 +286,11 @@ def main(train_csv,
 
 if __name__ == "__main__":
     if os.path.exists("/Users/nduginets/Desktop"):
-        path = "/Users/nduginets/PycharmProjects/master-diploma/GAN_to_box/test_data/0000150/test_report.csv"
+        path = "/Users/nduginets/PycharmProjects/master-diploma/GAN_to_box/test_data/0000150/test_report_shifted.csv"
         params = pl.initialize([
             '--train_csv', path,
             "--validate_csv", path,
-            "--epochs", "400",
+            "--epochs", "2000",
             "--result_dir", "/Users/nduginets/Desktop",
             "--experiment_name", "tmp",
             "--num_workers", "0",  # stupid Mac os!!!!
