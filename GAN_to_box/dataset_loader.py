@@ -27,7 +27,7 @@ class CSVDataset(data.Dataset):
 
     def __getitem__(self, index):
         if self.use_augumentation:
-            t = torch.randint(90, 110, (360,)) / 100.0
+            t = torch.randint(95, 105, (360,)) / 100.0
             return self.data[index] * t
         else:
             return self.data[index]
