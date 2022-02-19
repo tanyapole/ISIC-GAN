@@ -22,6 +22,7 @@ import logging
 import math
 import MY_GAN as GAN
 import boundary_seeking_gan as BSGAN
+import tanh_boundary_seeking_gan as TBSGAN
 
 np.set_printoptions(precision=4, suppress=True)
 THRESHOLD = 0.5
@@ -184,68 +185,6 @@ def train_epoch(device,
             batch_size * 3
         )
 
-        """
-        if phase == 'train':
-            generator.zero_grad()
-            discriminator.zero_grad()
-
-        with torch.set_grad_enabled(phase == 'train'):
-            true_label = torch.full((batch_size,), 1.0, dtype=torch.float, device=device)
-
-            true_D_output = discriminator(bounding_boxes_data).view(-1)
-            error_real_D = criterion(true_D_output, true_label)
-            if phase == "train":
-                error_real_D.backward()  # update gradient for Discriminator TRUE data
-            noise = torch.randn(batch_size, 100, device=device)
-            fake_G_output = generator(noise)  # .reshape(batch_size, features_count, 1, 1)
-
-            fake_label = torch.full((batch_size,), 0.0, dtype=torch.float, device=device)
-            fake_D_output = discriminator(fake_G_output).view(-1)
-
-            error_fake_D = criterion(fake_D_output, fake_label)
-
-            if phase == 'train':
-                discriminator.step()  # RECALCULATE WEIGHTS
-                error_fake_D.backward()  # update gradient for Discriminator FALSE data
-            error_D = error_real_D + error_fake_D  # COMMON ERROR
-
-            ######################
-            # GENERATOR
-            ######################
-
-            # true because generator think that's true
-            # насколько хорошо генератор смог обмануть дискриминатор
-            true_label = torch.full((batch_size,), 1.0, dtype=torch.float, device=device)
-            generated_fake_data = generator(noise)  # .reshape(batch_size, features_count, 1, 1)
-            output = discriminator(generated_fake_data).view(-1)
-            error_G = criterion(output, true_label)
-            if phase == 'train':
-                error_G.backward()  # RECALCULATE WEIGHTS
-                generator.step()
-
-            losses["fake_D"].update(fake_D_output.sum().cpu().item(), batch_size)
-            losses["true_D"].update(true_D_output.sum().cpu().item(), batch_size)
-            losses["D"].update((true_D_output.sum() + fake_D_output.sum()).cpu().item(), batch_size * 2)
-            losses["true_G"].update(output.sum().cpu().item(), batch_size)
-            losses["sum"].update((true_D_output + fake_D_output + output).sum().cpu().item(), batch_size * 3)
-
-            fake_D_output_copy = crate_thresholded_data(fake_D_output)
-            true_D_output_copy = crate_thresholded_data(true_D_output)
-            output_copy = crate_thresholded_data(output)
-
-            accuracies["fake_D"].update(torch.sum(fake_D_output_copy == fake_label).item(), batch_size)
-            accuracies["true_D"].update(torch.sum(true_D_output_copy == true_label).item(), batch_size)
-            accuracies["D"].update(
-                (torch.sum(true_D_output_copy == true_label) + torch.sum(fake_D_output_copy == fake_label)).item(),
-                batch_size * 2)
-            accuracies["true_G"].update(torch.sum(output_copy == true_label).item(), batch_size)
-            accuracies["sum"].update(
-                torch.sum(fake_D_output_copy == fake_label).item() +
-                torch.sum(true_D_output_copy == true_label).item() +
-                torch.sum(output_copy == true_label).item(),
-                batch_size * 3
-            )
-        """
         tqdm_loader.set_postfix(loss=("D=" + str(losses["D"].avg), "G=" + str(losses["true_G"].avg)),
                                 acc=("D=" + str(accuracies["D"].avg), "G=" + str(accuracies["true_G"].avg)),
                                 _epoch=epoch_number)
@@ -283,6 +222,9 @@ def main(train_csv,
     elif model_name == "boundary-seeking-gan":
         modelG = BSGAN.Generator()  # ModelWithSigmoidOut(GAN.Generator())
         modelD = BSGAN.Discriminator()  # ModelWithSigmoidOut(GAN.Discriminator())
+    elif model_name == "tanh_boundary_seeking_gan":
+        modelG = TBSGAN.Generator()  # ModelWithSigmoidOut(GAN.Generator())
+        modelD = TBSGAN.Discriminator()  # ModelWithSigmoidOut(GAN.Discriminator())
     modelG.to(device)
     modelD.to(device)
 
@@ -353,7 +295,7 @@ if __name__ == "__main__":
             "--experiment_name", "tmp",
             "--num_workers", "0",  # stupid Mac os!!!!
             "--batch_size", "7",
-            "--model_name", "boundary-seeking-gan",
+            "--model_name", "tanh_boundary_seeking_gan",
         ])
     else:
         params = pl.initialize()
