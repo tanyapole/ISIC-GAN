@@ -6,12 +6,21 @@ import os
 import glob
 
 if __name__ == "__main__":
+    sys.argv = ["", "/Users/nduginets/PycharmProjects/master-diploma/GAN_to_box/test_data/isic_2018_boxes.csv",
+                "/Users/nduginets/PycharmProjects/master-diploma/GAN_to_box/test_data/isic_2018_boxes_shifted.csv"]
+
     if len(sys.argv) != 3:
         exit(1)
     from_file = sys.argv[1]
     to_file = sys.argv[2]
 
     from_frame = pd.read_csv(from_file)
-    mapping = lambda x: x * 2.0 - 1.0
-    from_frame = from_frame.applymap(mapping)
+    headers = from_frame.columns[1:]
+    indexes = list(from_frame.index)
+    for h in headers:
+        for i in indexes:
+            if "size" in h:
+                from_frame.at[i, h] *= 2
+            else:
+                from_frame.at[i, h] = from_frame.at[i, h] * 2 - 1
     from_frame.to_csv(to_file, index=False)
