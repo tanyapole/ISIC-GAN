@@ -261,32 +261,6 @@ def create_rectangles(image, extend_to):
         res[i] = class_index[i]
     return res
 
-
-# color != 0
-"""
-    for i in range(len(class_index)):
-        for j in range(i + 1, len(class_index)):
-            a_i_1, a_j_1 = class_index[i][2]
-            a_i_2, a_j_2 = class_index[i][3]
-
-            b_i_1, b_j_1 = class_index[j][2]
-            b_i_2, b_j_2 = class_index[j][3]
-
-            if a_i_1 < b_i_2 and a_i_2 > b_i_1 and a_j_1 < b_j_2 and a_j_2 > b_j_1:
-                sq_a = (a_i_1 - a_i_2) ** 2 + (a_j_1 - a_j_2) ** 2
-                sq_b = (b_i_1 - b_i_2) ** 2 + (b_j_1 - b_j_2) ** 2
-                # case when rect_a in rect_b covered by square comparison
-                if sq_a < sq_b:
-                    tmp = class_index[i]
-                    class_index[i] = class_index[j]
-                    class_index[j] = tmp
-
-    rectangle_image = np.zeros(msk.shape)
-    for (cls, color, (min_i, min_j), (max_i, max_j)) in class_index:
-        rectangle_image[min_i: max_i, min_j:max_j] = color
-    return rectangle_image
-"""
-
 import GLOBAL as G
 import csv
 
@@ -315,7 +289,7 @@ def f_by_threshold(image):
 
 def process_single_image_pack(index, attrs, segments, extend_to):
     segment_file = segments[index]
-    attribute_files = attrs[index: index + G.LABELS_SIZE]
+    attribute_files = attrs[index: index * G.LABELS_SIZE + G.LABELS_SIZE]
     segment_borders = create_rectangles(f_by_threshold(imread(segment_file, flatten=True)), extend_to)
     attribute_borders = [create_rectangles(f_by_threshold(imread(i, flatten=True)), extend_to) for i in attribute_files]
     merged = [segment_borders] + attribute_borders
@@ -352,7 +326,7 @@ def create_bounding_boxes(base_path, attribute_name, segmentation_name, export_t
 
 
 if __name__ == "__main__":
-    """print(sys.argv)
+    print(sys.argv)
     if len(sys.argv) != 5:
         print("expected base data path, got: ", sys.argv)
         exit(1)
@@ -360,7 +334,7 @@ if __name__ == "__main__":
     attr_dir = sys.argv[2]
     segm_dir = sys.argv[3]
     name = sys.argv[4]
-    #create_bounding_boxes(path, attr_dir, segm_dir, name)
-    """
-    create_bounding_boxes("/Users/nduginets/PycharmProjects/master-diploma/GAN_to_box/test_data/0000150",
-                           "attribute_512p", "seg_512p", "test_report.csv")
+    create_bounding_boxes(path, attr_dir, segm_dir, name)
+
+    #create_bounding_boxes("/Users/nduginets/PycharmProjects/master-diploma/GAN_to_box/test_data/0000150",
+    #                       "attribute_512p", "seg_512p", "test_report.csv")
