@@ -289,7 +289,7 @@ def f_by_threshold(image):
 
 def process_single_image_pack(index, attrs, segments, extend_to):
     segment_file = segments[index]
-    attribute_files = attrs[index: index * G.LABELS_SIZE + G.LABELS_SIZE]
+    attribute_files = attrs[index * G.LABELS_SIZE: index * G.LABELS_SIZE + G.LABELS_SIZE]
     segment_borders = create_rectangles(f_by_threshold(imread(segment_file, flatten=True)), extend_to)
     attribute_borders = [create_rectangles(f_by_threshold(imread(i, flatten=True)), extend_to) for i in attribute_files]
     merged = [segment_borders] + attribute_borders
@@ -315,6 +315,8 @@ def create_bounding_boxes(base_path, attribute_name, segmentation_name, export_t
     sgts = sorted(glob.glob(os.path.join(segm_dir, "*.png")))
     extend_to = 15
     header = create_csv_header(extend_to)
+
+
     results = Parallel(n_jobs=8)(
         delayed(process_single_image_pack)(i, atr, sgts, extend_to) for i in tqdm(range(0, len(sgts))))
     with open(file_name, "w", encoding='UTF8') as f:
