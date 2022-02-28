@@ -27,7 +27,7 @@ ndf = 64
 
 
 class Generator(nn.Module):
-    def __init__(self, output_size=360):
+    def __init__(self, output_size):
         super(Generator, self).__init__()
 
         def block(in_feat, out_feat, normalize=True):
@@ -51,7 +51,7 @@ class Generator(nn.Module):
 
 
 class Discriminator(nn.Module):
-    def __init__(self, output_size=360):
+    def __init__(self, output_size):
         super(Discriminator, self).__init__()
 
         self.model = nn.Sequential(
@@ -71,8 +71,8 @@ class Discriminator(nn.Module):
 
 if __name__ == "__main__":
     t = torch.randn((10, 100))
-    g = Generator()
+    g = Generator(30)
     res = g(t)
-    d = Discriminator()
+    d = Discriminator(30)
 
     print(d(res))

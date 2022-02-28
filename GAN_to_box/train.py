@@ -28,7 +28,6 @@ np.set_printoptions(precision=4, suppress=True)
 THRESHOLD = 0.5
 lr = 0.0001
 beta1 = 0.5
-features_count = 360
 
 
 class ModelWithSigmoidOut(nn.Module):
