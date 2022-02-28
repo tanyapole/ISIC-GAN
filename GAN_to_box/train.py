@@ -218,30 +218,6 @@ def main(train_csv,
         # 'val': test_metrics
     }
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    if model_name == "my":
-        modelG = GAN.Generator()  # ModelWithSigmoidOut(GAN.Generator())
-        modelD = GAN.Discriminator()  # ModelWithSigmoidOut(GAN.Discriminator())
-    elif model_name == "boundary-seeking-gan":
-        modelG = BSGAN.Generator()  # ModelWithSigmoidOut(GAN.Generator())
-        modelD = BSGAN.Discriminator()  # ModelWithSigmoidOut(GAN.Discriminator())
-    elif model_name == "tanh_boundary_seeking_gan":
-        modelG = TBSGAN.Generator()  # ModelWithSigmoidOut(GAN.Generator())
-        modelD = TBSGAN.Discriminator()  # ModelWithSigmoidOut(GAN.Discriminator())
-    modelG.to(device)
-    modelD.to(device)
-
-    latest_known_epoch = train_metrics.latest_key(-1)
-    logging.info("detected epoch number: {} of: {}".format(latest_known_epoch, epochs))
-    if latest_known_epoch == -1:
-        epochs_list = [i for i in range(epochs)]
-        logging.info("start from begining")
-    else:
-        epochs_list = [i for i in range(latest_known_epoch + 1, epochs)]
-        logging.info("start from epoch number: {}".format(latest_known_epoch + 1))
-        modelG = torch.load(last_model_G_path)
-        modelD = torch.load(last_model_D_path)
-
     # image_name, target
     train_ds = CSVDataset(train_csv)
     # val_ds = CSVDataset(val_csv)
@@ -256,8 +232,30 @@ def main(train_csv,
         # 'val': dl_val,
     }
 
-    # Initialize BCELoss function
-    # criterion = nn.BCELoss()
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    if model_name == "my":
+        modelG = GAN.Generator()  # ModelWithSigmoidOut(GAN.Generator())
+        modelD = GAN.Discriminator()  # ModelWithSigmoidOut(GAN.Discriminator())
+    elif model_name == "boundary-seeking-gan":
+        modelG = BSGAN.Generator(train_ds.metadata.count)  # ModelWithSigmoidOut(GAN.Generator())
+        modelD = BSGAN.Discriminator(train_ds.metadata.count)  # ModelWithSigmoidOut(GAN.Discriminator())
+    elif model_name == "tanh_boundary_seeking_gan":
+        modelG = TBSGAN.Generator(train_ds.metadata.count)  # ModelWithSigmoidOut(GAN.Generator())
+        modelD = TBSGAN.Discriminator(train_ds.metadata.count)  # ModelWithSigmoidOut(GAN.Discriminator())
+    modelG.to(device)
+    modelD.to(device)
+
+    latest_known_epoch = train_metrics.latest_key(-1)
+    logging.info("detected epoch number: {} of: {}".format(latest_known_epoch, epochs))
+    if latest_known_epoch == -1:
+        epochs_list = [i for i in range(epochs)]
+        logging.info("start from begining")
+    else:
+        epochs_list = [i for i in range(latest_known_epoch + 1, epochs)]
+        logging.info("start from epoch number: {}".format(latest_known_epoch + 1))
+        modelG = torch.load(last_model_G_path)
+        modelD = torch.load(last_model_D_path)
 
     optimizerG = optim.Adam(modelG.parameters(), lr=lr, betas=(beta1, 0.999))
     optimizerD = optim.Adam(modelD.parameters(), lr=lr, betas=(beta1, 0.999))

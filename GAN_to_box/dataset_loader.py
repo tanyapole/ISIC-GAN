@@ -12,6 +12,7 @@ class DatasetMetadata:
         self.unique_names = set(list(map(lambda x: x.split("_")[0], self.target_fields)))
         self.offset_map = {n: (map_by_name.index(n), len(map_by_name) - map_by_name[::-1].index(n) - 1) for n in
                            self.unique_names}
+        self.count = len(map_by_name)
 
 
 class CSVDataset(data.Dataset):
