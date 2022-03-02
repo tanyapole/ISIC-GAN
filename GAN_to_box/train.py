@@ -147,7 +147,7 @@ def train_epoch(device,
         fake = Variable(torch.empty(batch_size, 1, device=device).fill_(0.0), requires_grad=False)
 
         z = Variable(torch.tensor(np.random.normal(0, 1, (batch_size, 100)), dtype=torch.float, device=device))
-        for i in range(20):
+        for i in range(4):
             generator.zero_grad()
             gen_boxes = generator(z)
 
