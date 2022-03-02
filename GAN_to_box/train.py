@@ -129,7 +129,7 @@ def train_epoch(device,
 
     generator_criterion = nn.MSELoss()
     discriminator_criterion = nn.BCELoss()
-    for data in tqdm_loader:
+    for idx, data in enumerate(tqdm_loader):
         generator.zero_grad()
         discriminator.zero_grad()
 
@@ -191,6 +191,11 @@ def train_epoch(device,
         tqdm_loader.set_postfix(loss=("D=" + str(losses["D"].avg), "G=" + str(losses["true_G"].avg)),
                                 acc=("D=" + str(accuracies["D"].avg), "G=" + str(accuracies["true_G"].avg)),
                                 _epoch=epoch_number)
+        if idx == 0:
+            print("fake_d_output", fake_d_output[0: 100])
+            print("real_d_output", real_d_output[0: 100])
+            print("fake_g_output", fake_g_output[0: 100])
+
 
     result_cell = {}
     result_cell['loss'] = {}
@@ -231,7 +236,6 @@ def main(train_csv,
         'train': dl_train,
         # 'val': dl_val,
     }
-
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     if model_name == "my":
