@@ -25,7 +25,7 @@ import boundary_seeking_gan as BSGAN
 import tanh_boundary_seeking_gan as TBSGAN
 
 np.set_printoptions(precision=4, suppress=True)
-THRESHOLD = 0.0
+THRESHOLD = 0.0001
 lr = 0.0001
 beta1 = 0.5
 
