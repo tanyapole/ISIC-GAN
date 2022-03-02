@@ -17,8 +17,8 @@ class DatasetMetadata:
         self.torch_vector = torch.zeros(self.count, dtype=torch.float)
         for i in range(self.count // 4):
             p = i * 4
-            self.torch_vector[p + 2] = 1
-            self.torch_vector[p + 3] = 1
+            self.torch_vector[p + 2] = 10
+            self.torch_vector[p + 3] = 10
 
 
 class CSVDataset(data.Dataset):
