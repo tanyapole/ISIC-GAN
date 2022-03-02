@@ -192,9 +192,9 @@ def train_epoch(device,
                                 acc=("D=" + str(accuracies["D"].avg), "G=" + str(accuracies["true_G"].avg)),
                                 _epoch=epoch_number)
         if idx == 0:
-            print("fake_d_output", fake_d_output[0: 100])
-            print("real_d_output", real_d_output[0: 100])
-            print("fake_g_output", fake_g_output[0: 100])
+            print("fake_d_output", fake_d_output.T[0: 100])
+            print("real_d_output", real_d_output.T[0: 100])
+            print("fake_g_output", fake_g_output.T[0: 100])
 
 
     result_cell = {}
