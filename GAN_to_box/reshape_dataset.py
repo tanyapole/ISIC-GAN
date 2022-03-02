@@ -20,7 +20,7 @@ if __name__ == "__main__":
     for h in headers:
         for i in indexes:
             if "size" in h:
-                from_frame.at[i, h] *= 2
+                from_frame.at[i, h] *= 1 # here I won't mult by 2 because tanh must be in range (-1, 1)
             else:
                 from_frame.at[i, h] = from_frame.at[i, h] * 2 - 1
     from_frame.to_csv(to_file, index=False)

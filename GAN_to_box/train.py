@@ -107,6 +107,7 @@ def train_epoch(device,
         "true_D": AverageMeter(),
         "D": AverageMeter(),
         "true_G": AverageMeter(),
+        "deviation_G": AverageMeter(),
         "sum": AverageMeter()
     }
     accuracies = {
@@ -140,14 +141,21 @@ def train_epoch(device,
         fake = Variable(torch.empty(batch_size, 1, device=device).fill_(0.0), requires_grad=False)
 
         z = Variable(torch.tensor(np.random.normal(0, 1, (batch_size, 100)), dtype=torch.float, device=device))
-        for i in range(10):
+        for i in range(20):
             generator.zero_grad()
-
             gen_boxes = generator(z)
 
-            fake_g_output = discriminator(gen_boxes)
-            g_loss = discriminator_criterion(fake_g_output, valid)
-            g_loss.backward()
+            if i % 2 == 0:
+                fake_g_output = discriminator(gen_boxes)
+                g_loss = discriminator_criterion(fake_g_output, valid)
+                g_loss.backward()
+            else:
+                mult_tensor = torch.zeros((batch_size, metadata.count), dtype=torch.float)
+                for pos in range(batch_size):
+                    mult_tensor[pos] = metadata.torch_vector
+                gen_boxes = gen_boxes * mult_tensor
+                deviation_loss = generator_criterion(gen_boxes, mult_tensor)
+                deviation_loss.backward()
             generator.step()
 
         z = Variable(torch.tensor(np.random.normal(0, 1, (batch_size, 100)), dtype=torch.float, device=device))
@@ -169,6 +177,7 @@ def train_epoch(device,
         losses["true_D"].update(real_loss.sum().cpu().item(), batch_size)
         losses["D"].update((real_loss.sum() + fake_loss.sum()).cpu().item(), batch_size * 2)
         losses["true_G"].update(g_loss.sum().cpu().item(), batch_size)
+        losses["deviation_G"].update(deviation_loss.sum().cpu().item(), batch_size)
         losses["sum"].update((g_loss + fake_loss + real_loss).sum().cpu().item(), batch_size * 3)
 
         fake_D_output_copy = crate_thresholded_data(fake_d_output)
@@ -191,10 +200,8 @@ def train_epoch(device,
         tqdm_loader.set_postfix(loss=("D=" + str(losses["D"].avg), "G=" + str(losses["true_G"].avg)),
                                 acc=("D=" + str(accuracies["D"].avg), "G=" + str(accuracies["true_G"].avg)),
                                 _epoch=epoch_number)
-        if idx == 0:
-            print("gen_boxes", gen_boxes.T[0: 100])
-            print("real_d_output", real_d_output.T[0: 100])
-            print("fake_g_output", fake_g_output.T[0: 100])
+        #if idx == 0:
+        #    print("gen_boxes", gen_boxes.T[0: 100])
 
     result_cell = {}
     result_cell['loss'] = {}
@@ -290,7 +297,7 @@ def main(train_csv,
 
 if __name__ == "__main__":
     if os.path.exists("/Users/nduginets/Desktop"):
-        path = "/Users/nduginets/PycharmProjects/master-diploma/GAN_to_box/test_data/0000150/test_report_shifted.csv"
+        path = "/Users/nduginets/PycharmProjects/master-diploma/GAN_to_box/test_data/isic_2018_boxes_shifted.csv"
         params = pl.initialize([
             '--train_csv', path,
             "--validate_csv", path,
