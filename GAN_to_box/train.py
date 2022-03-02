@@ -131,7 +131,7 @@ def train_epoch(device,
     generator_criterion = nn.MSELoss()
     discriminator_criterion = nn.BCELoss()
 
-    default_cnt = 10_000
+    default_cnt = 100
     mult_tensor = torch.zeros((default_cnt, metadata.count), dtype=torch.float, device=device)
     for pos in range(default_cnt):
         mult_tensor[pos] = metadata.torch_vector
