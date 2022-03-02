@@ -25,7 +25,7 @@ import boundary_seeking_gan as BSGAN
 import tanh_boundary_seeking_gan as TBSGAN
 
 np.set_printoptions(precision=4, suppress=True)
-THRESHOLD = 0.0
+THRESHOLD = 0.5
 lr = 0.0001
 beta1 = 0.5
 
@@ -171,6 +171,9 @@ def train_epoch(device,
         losses["true_G"].update(g_loss.sum().cpu().item(), batch_size)
         losses["sum"].update((g_loss + fake_loss + real_loss).sum().cpu().item(), batch_size * 3)
 
+        # todo !!! не та точность
+        sdfsdfsdffsdfsdfjkbfldhfjlkdjhvjslkdfghsdlkjgvjhdskljfgvhserkjl12312390rfuvb
+        0[pgeawocj]
         fake_D_output_copy = crate_thresholded_data(fake_d_output)
         true_D_output_copy = crate_thresholded_data(real_d_output)
         output_copy = crate_thresholded_data(fake_g_output)
@@ -212,7 +215,6 @@ def main(train_csv,
     last_model_G_path = os.path.join(experiment_path, "last_model_G.pth")
     last_model_D_path = os.path.join(experiment_path, "last_model_D.pth")
     train_metrics = utils.Dumper(os.path.join(experiment_path, "train_metrics.json"))
-    # test_metrics = utils.Dumper(os.path.join(experiment_path, "test_metrics.json"))
     metric_holder = {
         'train': train_metrics,
         # 'val': test_metrics
@@ -231,7 +233,6 @@ def main(train_csv,
         'train': dl_train,
         # 'val': dl_val,
     }
-
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     if model_name == "my":
