@@ -150,7 +150,7 @@ def train_epoch(device,
                 g_loss = discriminator_criterion(fake_g_output, valid)
                 g_loss.backward()
             else:
-                mult_tensor = torch.zeros((batch_size, metadata.count), dtype=torch.float)
+                mult_tensor = torch.zeros((batch_size, metadata.count), dtype=torch.float, device=device)
                 for pos in range(batch_size):
                     mult_tensor[pos] = metadata.torch_vector
                 gen_boxes = gen_boxes * mult_tensor
