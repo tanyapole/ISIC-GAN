@@ -130,6 +130,12 @@ def train_epoch(device,
 
     generator_criterion = nn.MSELoss()
     discriminator_criterion = nn.BCELoss()
+
+    default_cnt = 10_000
+    mult_tensor = torch.zeros((default_cnt, metadata.count), dtype=torch.float, device=device)
+    for pos in range(default_cnt):
+        mult_tensor[pos] = metadata.torch_vector
+
     for idx, data in enumerate(tqdm_loader):
         generator.zero_grad()
         discriminator.zero_grad()
@@ -150,11 +156,9 @@ def train_epoch(device,
                 g_loss = discriminator_criterion(fake_g_output, valid)
                 g_loss.backward()
             else:
-                mult_tensor = torch.zeros((batch_size, metadata.count), dtype=torch.float, device=device)
-                for pos in range(batch_size):
-                    mult_tensor[pos] = metadata.torch_vector
-                gen_boxes = gen_boxes * mult_tensor
-                deviation_loss = generator_criterion(gen_boxes, mult_tensor)
+                mult_tensor_tmp = mult_tensor[:batch_size]
+                gen_boxes = gen_boxes * mult_tensor_tmp
+                deviation_loss = generator_criterion(gen_boxes, mult_tensor_tmp)
                 deviation_loss.backward()
             generator.step()
 
