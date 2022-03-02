@@ -14,6 +14,12 @@ class DatasetMetadata:
                            self.unique_names}
         self.count = len(map_by_name)
 
+        self.torch_vector = torch.zeros(self.count, dtype=torch.float)
+        for i in range(self.count // 4):
+            p = i * 4
+            self.torch_vector[p + 2] = 1
+            self.torch_vector[p + 3] = 1
+
 
 class CSVDataset(data.Dataset):
     def __init__(self, csv_file, use_augumentation=True):
