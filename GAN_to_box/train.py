@@ -204,8 +204,8 @@ def train_epoch(device,
         tqdm_loader.set_postfix(loss=("D=" + str(losses["D"].avg), "G=" + str(losses["true_G"].avg)),
                                 acc=("D=" + str(accuracies["D"].avg), "G=" + str(accuracies["true_G"].avg)),
                                 _epoch=epoch_number)
-        #if idx == 0:
-        #    print("gen_boxes", gen_boxes.T[0: 100])
+        if idx == 0:
+            print("gen_boxes", gen_boxes.T[0: 100])
 
     result_cell = {}
     result_cell['loss'] = {}
