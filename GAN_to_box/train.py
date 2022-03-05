@@ -102,7 +102,8 @@ def train_epoch(device,
                 metric_holder,
                 phase,
                 epoch_number,
-                metadata: DatasetMetadata):
+                metadata: DatasetMetadata,
+                use_count: bool):
     losses = {
         "fake_D": AverageMeter(),
         "true_D": AverageMeter(),
@@ -137,12 +138,15 @@ def train_epoch(device,
     for pos in range(default_cnt):
         mult_tensor[pos] = metadata.torch_vector
 
-    for idx, data in enumerate(tqdm_loader):
+    for idx, (data, count_data) in enumerate(tqdm_loader):
         generator.zero_grad()
         discriminator.zero_grad()
-
-        bounding_boxes_data = Variable(data.detach().to(device))
-        batch_size = data.shape[0]
+        if not use_count:
+            bounding_boxes_data = Variable(data.detach().to(device))
+            batch_size = data.shape[0]
+        else:
+            bounding_boxes_data = Variable(count_data.detach().to(device))
+            batch_size = count_data.shape[0]
 
         valid = Variable(torch.empty(batch_size, 1, device=device).fill_(1.0), requires_grad=False)
         fake = Variable(torch.empty(batch_size, 1, device=device).fill_(0.0), requires_grad=False)
@@ -151,12 +155,11 @@ def train_epoch(device,
             z = Variable(torch.tensor(np.random.normal(0, 1, (batch_size, 100)), dtype=torch.float, device=device))
             generator.zero_grad()
             gen_boxes = generator(z)
-
             if i % 2 == 0:
                 fake_g_output = discriminator(gen_boxes)
                 g_loss = discriminator_criterion(fake_g_output, valid)
                 g_loss.backward()
-            else:
+            elif i % 2 == 1 and not use_count:
                 mult_tensor_tmp = mult_tensor[:batch_size]
                 gen_boxes = gen_boxes * mult_tensor_tmp
                 deviation_loss = generator_criterion(gen_boxes, mult_tensor_tmp)
@@ -182,7 +185,10 @@ def train_epoch(device,
         losses["true_D"].update(real_loss.sum().cpu().item(), batch_size)
         losses["D"].update((real_loss.sum() + fake_loss.sum()).cpu().item(), batch_size * 2)
         losses["true_G"].update(g_loss.sum().cpu().item(), batch_size)
-        losses["deviation_G"].update(deviation_loss.sum().cpu().item(), batch_size)
+        if not use_count:
+            losses["deviation_G"].update(deviation_loss.sum().cpu().item(), batch_size)
+        else:
+            losses["deviation_G"].update(0, batch_size)
         losses["sum"].update((g_loss + fake_loss + real_loss).sum().cpu().item(), batch_size * 3)
 
         fake_D_output_copy = crate_thresholded_data(fake_d_output)
@@ -205,8 +211,8 @@ def train_epoch(device,
         tqdm_loader.set_postfix(loss=("D=" + str(losses["D"].avg), "G=" + str(losses["true_G"].avg)),
                                 acc=("D=" + str(accuracies["D"].avg), "G=" + str(accuracies["true_G"].avg)),
                                 _epoch=epoch_number)
-        if idx == 0:
-            print("gen_boxes", gen_boxes.T[0: 100])
+        #if idx == 0:
+        #    print("gen_boxes", gen_boxes.T[0: 100])
 
     result_cell = {}
     result_cell['loss'] = {}
@@ -249,6 +255,7 @@ def main(train_csv,
     }
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    use_count = False
     if model_name == "my":
         modelG = GAN.Generator()
         modelD = GAN.Discriminator()
@@ -261,6 +268,7 @@ def main(train_csv,
     elif model_name == "gan_cnt":
         modelG = CNT_GAN.Generator()
         modelD = CNT_GAN.Discriminator()
+        use_count = True
     modelG.to(device)
     modelD.to(device)
 
@@ -291,7 +299,7 @@ def main(train_csv,
 
     for epoch in epochs_list:
         logging.debug('train epoch {}/{}'.format(epoch + 1, epochs))
-        train_epoch(device, gen, discr, dataloaders, metric_holder, 'train', epoch, dataset_metadata)
+        train_epoch(device, gen, discr, dataloaders, metric_holder, 'train', epoch, dataset_metadata, use_count)
 
         # logging.debug('val epoch {}/{}'.format(epoch + 1, epochs))
         # train_epoch(device, gen, discr, dataloaders, metric_holder, criterion, 'val', epoch, dataset_metadata)
@@ -314,7 +322,7 @@ if __name__ == "__main__":
             "--experiment_name", "tmp",
             "--num_workers", "0",  # stupid Mac os!!!!
             "--batch_size", "7",
-            "--model_name", "tanh_boundary_seeking_gan",
+            "--model_name", "gan_cnt",
         ])
     else:
         params = pl.initialize()
