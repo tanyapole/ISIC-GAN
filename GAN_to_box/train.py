@@ -23,6 +23,7 @@ import math
 import MY_GAN as GAN
 import boundary_seeking_gan as BSGAN
 import tanh_boundary_seeking_gan as TBSGAN
+import gan_counter as CNT_GAN
 
 np.set_printoptions(precision=4, suppress=True)
 THRESHOLD = 0.5
@@ -249,14 +250,17 @@ def main(train_csv,
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     if model_name == "my":
-        modelG = GAN.Generator()  # ModelWithSigmoidOut(GAN.Generator())
-        modelD = GAN.Discriminator()  # ModelWithSigmoidOut(GAN.Discriminator())
+        modelG = GAN.Generator()
+        modelD = GAN.Discriminator()
     elif model_name == "boundary-seeking-gan":
-        modelG = BSGAN.Generator(train_ds.metadata.count)  # ModelWithSigmoidOut(GAN.Generator())
-        modelD = BSGAN.Discriminator(train_ds.metadata.count)  # ModelWithSigmoidOut(GAN.Discriminator())
+        modelG = BSGAN.Generator(train_ds.metadata.count)
+        modelD = BSGAN.Discriminator(train_ds.metadata.count)
     elif model_name == "tanh_boundary_seeking_gan":
-        modelG = TBSGAN.Generator(train_ds.metadata.count)  # ModelWithSigmoidOut(GAN.Generator())
-        modelD = TBSGAN.Discriminator(train_ds.metadata.count)  # ModelWithSigmoidOut(GAN.Discriminator())
+        modelG = TBSGAN.Generator(train_ds.metadata.count)
+        modelD = TBSGAN.Discriminator(train_ds.metadata.count)
+    elif model_name == "gan_cnt":
+        modelG = CNT_GAN.Generator()
+        modelD = CNT_GAN.Discriminator()
     modelG.to(device)
     modelD.to(device)
 
