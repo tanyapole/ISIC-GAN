@@ -24,6 +24,7 @@ import MY_GAN as GAN
 import boundary_seeking_gan as BSGAN
 import tanh_boundary_seeking_gan as TBSGAN
 import gan_counter as CNT_GAN
+import gan_counter_simple_dec as CNT_GAN_SIMP
 
 np.set_printoptions(precision=4, suppress=True)
 THRESHOLD = 0.5
@@ -269,6 +270,10 @@ def main(train_csv,
         modelG = CNT_GAN.Generator()
         modelD = CNT_GAN.Discriminator()
         use_count = True
+    elif model_name == "gan_cnt_simple_dec":
+        modelG = CNT_GAN_SIMP.Generator()
+        modelD = CNT_GAN_SIMP.Discriminator()
+        use_count = True
     modelG.to(device)
     modelD.to(device)
 
@@ -322,7 +327,7 @@ if __name__ == "__main__":
             "--experiment_name", "tmp",
             "--num_workers", "0",  # stupid Mac os!!!!
             "--batch_size", "7",
-            "--model_name", "gan_cnt",
+            "--model_name", "gan_cnt_simple_dec",
         ])
     else:
         params = pl.initialize()
