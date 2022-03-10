@@ -293,11 +293,11 @@ def main(train_csv,
 
     schedulerG = optim.lr_scheduler.MultiStepLR(optimizerG,
                                                 milestones=[25],
-                                                gamma=0.1)
+                                                gamma=1)
 
     schedulerD = optim.lr_scheduler.MultiStepLR(optimizerD,
                                                 milestones=[25],
-                                                gamma=0.1)
+                                                gamma=1)
 
     gen = ModelOptimizerHolder(modelG, optimizerG, schedulerG)
     discr = ModelOptimizerHolder(modelD, optimizerD, schedulerD)
