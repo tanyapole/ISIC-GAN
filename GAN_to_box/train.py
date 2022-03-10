@@ -213,8 +213,8 @@ def train_epoch(device,
                                 acc=("D=" + str(accuracies["D"].avg), "G=" + str(accuracies["true_G"].avg)),
                                 _epoch=epoch_number)
         if idx == 0:
-            print("cnt data", count_data)
-            print("fake cnt data", gen_boxes)
+            print("cnt data", count_data[0])
+            print("fake cnt data", gen_boxes[0])
 
     result_cell = {}
     result_cell['loss'] = {}
