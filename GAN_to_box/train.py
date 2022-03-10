@@ -82,7 +82,7 @@ class ModelOptimizerHolder(nn.Module):
         return self
 
     def step(self):
-        self.scheduler.step()
+        self.optimizer.step()
         return self
 
     def zero_grad(self, set_to_none: bool = False):
