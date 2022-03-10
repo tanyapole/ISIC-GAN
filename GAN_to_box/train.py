@@ -217,6 +217,7 @@ def train_epoch(device,
             print("fake cnt data", gen_boxes[0])
             print("sum axes 0:", torch.sum(gen_boxes[0][0][0]))
             print("axes 0 min, max", torch.min(gen_boxes[0][0][0]), torch.max(gen_boxes[0][0][0]))
+            print("axes 0:", gen_boxes[0][0][0])
             print("")
 
     result_cell = {}
