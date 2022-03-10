@@ -54,8 +54,13 @@ class Discriminator(nn.Module):
 
 
 if __name__ == "__main__":
-    t = torch.randn((10, 100))
+    t = torch.randn((2, 100))
     g = Generator()
     res = g(t)
+    print(res)
     d = Discriminator()
     print(d(res))
+
+    a = [0.0636, 0.0615, 0.0613, 0.0623, 0.0623, 0.0629, 0.0635, 0.0636,
+           0.0629, 0.0616, 0.0618, 0.0645, 0.0610, 0.0619, 0.0631, 0.0622]
+    print(sum(a))

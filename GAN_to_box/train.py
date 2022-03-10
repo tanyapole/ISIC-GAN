@@ -215,6 +215,9 @@ def train_epoch(device,
         if idx == 0:
             print("cnt data", count_data[0])
             print("fake cnt data", gen_boxes[0])
+            print("sum axes 0:", torch.sum(gen_boxes[0][0][0]))
+            print("axes 0 min, max", torch.min(gen_boxes[0][0][0]), torch.max(gen_boxes[0][0][0]))
+            print("")
 
     result_cell = {}
     result_cell['loss'] = {}
