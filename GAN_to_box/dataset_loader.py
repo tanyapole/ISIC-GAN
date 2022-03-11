@@ -2,7 +2,7 @@ import pandas as pd
 import torch
 import torch.utils.data as data
 from torch.utils.data import DataLoader
-
+import numpy as np
 
 class DatasetMetadata:
 
@@ -27,7 +27,7 @@ class CSVDataset(data.Dataset):
         target_fields = self.pandas_data.columns[1:]
         self.data = [torch.tensor(self.pandas_data.loc[i, self.pandas_data.columns[1:]].values, dtype=torch.float)
                      for i in range(len(self.pandas_data))]
-        self.count_data = [CSVDataset.fill_cnt_tensor(i)for i in self.data]
+        self.count_data = [CSVDataset.fill_cnt_tensor(i) for i in self.data]
         self.metadata = DatasetMetadata(target_fields)
         self.use_augumentation = use_augumentation
 
@@ -52,10 +52,19 @@ class CSVDataset(data.Dataset):
                     cnt += 1
             # if cnt != 0:
             zeros[des][cnt] = 1
+        for i in range(0, 6):
+            for j in range(0, 16):
+                if zeros[i][j] == 0:
+                    zeros[i][j] = np.random.uniform(0.00001, 10 ** (-20))
+                else:
+                    zeros[i][j] = 1 - np.random.uniform(0.00001, 10 ** (-20))
         return zeros
 
 
 if __name__ == "__main__":
+    print(np.random.uniform(0.00001, 10**(-20)))
+    print(np.random.uniform(0.00001, 10 ** (-20)))
+    print(np.random.uniform(0.00001, 10 ** (-20)))
     path = "/Users/nduginets/PycharmProjects/master-diploma/GAN_to_box/test_data/isic_2018_boxes_shifted.csv"
     dataset = CSVDataset(path)
     dataloader = DataLoader(dataset)
