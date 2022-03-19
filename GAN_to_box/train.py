@@ -156,11 +156,11 @@ def train_epoch(device,
             z = Variable(torch.tensor(np.random.normal(0, 1, (batch_size, 100)), dtype=torch.float, device=device))
             generator.zero_grad()
             gen_boxes = generator(z)
-            if i % 2 == 0:
-                fake_g_output = discriminator(gen_boxes)
-                g_loss = discriminator_criterion(fake_g_output, valid)
-                g_loss.backward()
-            elif i % 2 == 1 and not use_count:
+            fake_g_output = discriminator(gen_boxes)
+            g_loss = discriminator_criterion(fake_g_output, valid)
+            g_loss.backward()
+
+            if i % 2 == 1 and not use_count:
                 mult_tensor_tmp = mult_tensor[:batch_size]
                 gen_boxes = gen_boxes * mult_tensor_tmp
                 deviation_loss = generator_criterion(gen_boxes, mult_tensor_tmp)
