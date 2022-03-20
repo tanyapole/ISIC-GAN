@@ -82,11 +82,12 @@ class CSVDataset(data.Dataset):
         max_size = max(map_cnt.values())
         new_data_set = []
 
-        for idx, (tensor_tuple, _) in enumerate(sorted([k for k in map_cnt.items()], key=lambda x: x[1], reverse=True)):
+        sorted_map = sorted([k for k in map_cnt.items()], key=lambda x: x[1], reverse=True)[100:210]
+
+        for idx, (tensor_tuple, _) in enumerate(sorted_map):
             tensor_list = [CSVDataset.create_tensor(tensor_tuple)] * max_size
             new_data_set.extend(tensor_list)
-            if idx == first_items:
-                break
+
 
         rnd.shuffle(new_data_set)
         return new_data_set
