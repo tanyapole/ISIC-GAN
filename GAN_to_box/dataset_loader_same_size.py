@@ -83,7 +83,8 @@ class CSVDataset(data.Dataset):
         new_data_set = []
 
         sorted_map = sorted([k for k in map_cnt.items()], key=lambda x: x[1], reverse=True)[100:210]
-
+        for k in sorted_map:
+            print(k)
         for idx, (tensor_tuple, _) in enumerate(sorted_map):
             tensor_list = [CSVDataset.create_tensor(tensor_tuple)] * max_size
             new_data_set.extend(tensor_list)
@@ -108,5 +109,5 @@ if __name__ == "__main__":
     dataset = CSVDataset(path)
     dataloader = DataLoader(dataset)
     for i in dataloader:
-        print(i[1])
+        # print(i[1])
         break
