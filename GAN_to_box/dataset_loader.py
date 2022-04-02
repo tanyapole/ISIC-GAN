@@ -22,13 +22,13 @@ class DatasetMetadata:
 
 
 class CSVDataset(data.Dataset):
-    def __init__(self, csv_file):
+    def __init__(self, csv_file, shifted=True):
         self.pandas_data = pd.read_csv(csv_file, sep=None)
         target_fields = self.pandas_data.columns[1:]
         self.data = [torch.tensor(self.pandas_data.loc[i, self.pandas_data.columns[1:]].values, dtype=torch.float)
                      for i in range(len(self.pandas_data))]
-        self.count_data = [CSVDataset.fill_cnt_tensor(i, False) for i in self.data]
-        self.count_data_augumented = [CSVDataset.fill_cnt_tensor(i, True) for i in self.data]
+        self.count_data = [CSVDataset.fill_cnt_tensor(i, False, shifted) for i in self.data]
+        self.count_data_augumented = [CSVDataset.fill_cnt_tensor(i, True, shifted) for i in self.data]
 
         self.metadata = DatasetMetadata(target_fields)
 
@@ -41,13 +41,13 @@ class CSVDataset(data.Dataset):
         return len(self.data)
 
     @staticmethod
-    def fill_cnt_tensor(t, augument):
+    def fill_cnt_tensor(t, augument, shifted):
         zeros = torch.zeros((6, 16))
         for des in range(0, 6):
             cnt = 0
             for i in range(0, 15):
                 offset = des * (15 * 4) + i * 4
-                if t[offset] != -1:
+                if t[offset] != (-1 if shifted else 0):
                     cnt += 1
             # if cnt != 0:
             zeros[des][cnt] = 1
