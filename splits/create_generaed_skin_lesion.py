@@ -75,11 +75,11 @@ if __name__ == "__main__":
     ranges = [i for i in range(0, 10)]
 
     data_to_csv("images/ISIC2018_Task1-2_Training_Input",
-                "pix2pix_result/label2skin/test_latest/images/",
+                "images/pix2pix_result/pix2pix_result/label2skin/test_latest/images/",
                 "/Users/nduginets/Desktop/images/ISIC2018_Task2_Training_GroundTruth_v3/", # ISIC2018_Task2_Validation_GroundTruth ISIC2018_Task2_Training_GroundTruth_v3
                 "generated/train_1{}_{}.csv", ranges, 90, True, items_to_use)
 
     data_to_csv("images/ISIC2018_Task1-2_Training_Input",
-                "pix2pix_result/label2skin/test_latest/images/",
+                "images/pix2pix_result/pix2pix_result/label2skin/test_latest/images/",
                 "/Users/nduginets/Desktop/images/ISIC2018_Task2_Training_GroundTruth_v3/", # ISIC2018_Task2_Validation_GroundTruth ISIC2018_Task2_Training_GroundTruth_v3
                 "generated/train_1{}_{}.csv", ranges, 100, True, items_to_use)
