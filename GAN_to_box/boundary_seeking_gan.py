@@ -70,9 +70,11 @@ class Discriminator(nn.Module):
 
 
 if __name__ == "__main__":
-    t = torch.randn((10, 100))
+    """t = torch.randn((10, 100))
     g = Generator()
     res = g(t)
     d = Discriminator()
+    print(d(res))"""
 
-    print(d(res))
+    o = np.ones((256, 256, 3))
+    print(np.unique(np.array([1, 4, 8, 8, 2, 2, 8])))
