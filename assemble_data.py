@@ -270,3 +270,6 @@ if __name__ == "__main__":
         exit(1)
     path = sys.argv[1]
     indian_code(path)
+    a = "sdfsdfjhsdflkjsdjfhlsdjkfhslfsdlfhsdjklfsdhlfsdkljfhsdlfjksdhlfsjdklfhlksfhldsfhslkfhdslkfhsdlfkshdlfsjflhs"\
+        .format(
+        "dv")

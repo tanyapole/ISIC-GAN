@@ -71,7 +71,8 @@ def __draw_metric_subplots(metric_name, datas, subplot):
                 if idx in ys[f_idx]:
                     averages.append(ys[f_idx][idx][metric_name])
                 else:
-                    averages.append(-1.0)
+                    pass
+                    # averages.append(-1.0)
             y_values.append(np.mean(np.array(averages)))
         items[name] = (x, y_values)
 
@@ -105,7 +106,8 @@ def __draw_metric_by_deceases_subplot(deceases, metric_name, datas, axes):
                 if idx in ys[f_idx]:
                     averages.append(ys[f_idx][idx][deceases][metric_name])
                 else:
-                    averages.append(-1.0)
+                    pass
+                    #averages.append(-1.0)
             y_values.append(np.mean(np.array(averages)))
         items[name] = (x, y_values)
 
