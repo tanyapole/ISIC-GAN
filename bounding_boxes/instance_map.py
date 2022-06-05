@@ -14,7 +14,6 @@ from tqdm import tqdm
 import os
 from joblib import Parallel, delayed
 
-
 import numpy
 
 from numpy import (amin, amax, ravel, asarray, arange, ones, newaxis,
