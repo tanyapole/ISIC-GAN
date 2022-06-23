@@ -23,18 +23,24 @@
 * When the pix2pix model was trained, need to generate synthesized images 
 * `python3 test.py --name <experiment-name> --dataroot <path-to-lesions-with-masks> --checkpoints_dir <directory-to-storage-temporary-results> --label_nc 8 --how_many 10000 --gpu_id  <gpu-id> --results_dir images/pix2pix_result/` -- this script will create generated images
 
+### Augmentation techniques
+* At this step need to create fake images
+* go to `bboxes` folder
+* execute `python 1_noise_crop.py <path-to-bounding_boxes_metadata.csv> <path-to-folder-images_512p> <base-path-to-storage-fake-images>`  -- this script will create a lot of fake images
+* execute `python 2_noise_data_to_pix2pix.py <base-path-to-storage-fake-images>`  -- process images created on the previous step to create images acceptable by pix2pix
+* pass generated data throw pix2pix GAN with command: `python3 test.py --name <experiment-name> --dataroot <path-to-lesions-with-masks> --checkpoints_dir <directory-to-storage-temporary-results> --label_nc 8 --how_many 10000 --gpu_id  <gpu-id> --results_dir <result-dir>`
+* execute `python 3_create_fake_dataset <base-path-to-storage-fake-images>` -- generates csv files
+* at the end you'll get set of folders with different strategies to train and execute
+
+
 ### Prepare data to pass into classification model
 * I already split datasets
 * use `splits` folder to train model with usual data
 * use `splits_boxed` folder to train model with bounding boxes 
-* If you want to create custom splitting
-
+* If you want to create custom splitting with scripts from `splits` folder
 
 ### Train classification model
 Model based on InceptionV4 network
-
 * `cd classificator_network` -- go to the classificator directory
-* `pythob train.py --train_root <full-path-to-train-images-folder>
-  --train_csv <full-path-to-train-csv-image> --validate_root <full-path-to-validate-images-folder> --validate_csv <full-path-to-validate-csv-image> --epochs <epochs-count> --result_dir <base-result-directory> --experiment_name <launch-name>` -- execute this code
-
-### Augmentation techniques
+* `pythob train.py --train_root <full-path-to-train-images-folder> --train_csv <full-path-to-train-csv-image> --validate_root <full-path-to-validate-images-folder> --validate_csv <full-path-to-validate-csv-image> --epochs <epochs-count> --result_dir <base-result-directory> --experiment_name <launch-name>` -- execute this code
+* after train you'll receive json file with metrics, which contains accuracy, f1 measure, AUC

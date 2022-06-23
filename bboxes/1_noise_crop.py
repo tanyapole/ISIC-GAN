@@ -14,15 +14,13 @@ from tqdm import tqdm
 from skimage import data, color
 from skimage.transform import rescale, resize, downscale_local_mean
 from PIL import Image
+import sys
 
 
-def main(base_path):
-    base_path = "/nfs/home/nduginets/"
-    dataset_path = os.path.join(base_path, "master-diploma/bboxes/bounding_boxes_metadata.csv")
+def main(bounding_boxes_metadata, imgs_path, base_path):
+    dataset_path = os.path.join(bounding_boxes_metadata)
 
     frame = pd.read_csv(dataset_path)
-
-    imgs_path = "/mnt/tank/scratch/nduginets/images/pix2pix_datasets/base_dataset_folder/images_512p"
 
     frame = pd.read_csv(dataset_path)
     images_list = sorted(glob.glob(os.path.join(imgs_path, "*.png")))
@@ -31,9 +29,9 @@ def main(base_path):
 
     # %%
 
-    IMAGE_PATH = "/mnt/tank/scratch/nduginets/images/noise_bboxes_v2/images"
-    SEGMENTATION_PATH = "/mnt/tank/scratch/nduginets/images/noise_bboxes_v2/segmentation"
-    ATTRIBUTES_PATH = "/mnt/tank/scratch/nduginets/images/noise_bboxes_v2/attributes"
+    IMAGE_PATH = base_path + "fake/images"
+    SEGMENTATION_PATH = base_path + "fake/segmentation"
+    ATTRIBUTES_PATH = base_path + "fake/attributes"
 
     os.makedirs(IMAGE_PATH, exist_ok=True)
     os.makedirs(SEGMENTATION_PATH, exist_ok=True)
@@ -288,3 +286,8 @@ def main(base_path):
         make_row_from_images(row, idx, a, b)
 
     res = Parallel(n_jobs=30)(delayed(print_some)(idx, v) for idx, v in tqdm(list(enumerate(list_of_a_b_idx))))
+    print(res)
+
+
+if __name__ == "__main__":
+    main(sys.argv[1], sys.argv[2], sys.argv[3])
