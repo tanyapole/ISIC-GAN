@@ -4,9 +4,9 @@
 * At the first datasets must be downloaded, in this work we used [ISIC 2018 dataset](https://challenge.isic-archive.com/data/#2018)
 * You must download 3 datasets:
   * Training data (10.4 G)
-  * Training Ground Truth (26 MB)
+  * Training Ground Truth (33 MB)
   * Validation Data (228 MB)
-  * Validation Ground Truth (742 KB)
+  * Validation Ground Truth (1 MB)
 * Create directory named `images`
 * Then unpack these zips into `images` directory
 * Out of the box already works baseline model, to support model with generated images pix2pix generator must be trained first
