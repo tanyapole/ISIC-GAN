@@ -11,6 +11,10 @@
 * Then unpack these zips into `images` directory
 * Out of the box already works baseline model, to support model with generated images pix2pix generator must be trained first
 
+### Prepare the environment
+* Install conda
+* Create conda env `conda env create -f envs.yml`
+
 ### Prepare dataset to train pix2pix network
 * to pass original images into pix2pix model it must be processed into the correseponded format
 * go to `dataset-to-pix2pix-data` folder
