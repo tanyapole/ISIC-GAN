@@ -7,7 +7,7 @@ then
   exit 1
 fi
 BASE_DIR="${DIR}"
-echo "$BASE_DIR"
+echo "Data root directory: $BASE_DIR"
 echo ""
 
 while getopts a:s:i: option
@@ -98,10 +98,10 @@ then
   exit 1
 fi
 BASE_DIR="${DIR}"
-echo "$BASE_DIR"
+echo "Data root directory: $BASE_DIR"
 echo ""
 
-python ~/master-diploma/instance_map.py "$BASE_DIR"
+python <code-root>/instance_map.py "$BASE_DIR"
 mkdir "$BASE_DIR/instance_map"
 cd "$BASE_DIR/instance_map"
 find "$BASE_DIR/instance_map_no_border" -name '*.png' -exec sh -c 'echo "{}"; convert "{}" -resize 1024x512\> -size 1024x512 xc:black +swap -gravity center -composite `basename "{}" .png`.png' \;
@@ -118,4 +118,4 @@ mv "$BASE_DIR/datasets/skin/semantic_map" "$BASE_DIR/datasets/skin/train_label"
 mv "$BASE_DIR/image_resized" "$BASE_DIR/datasets/skin/"
 mv "$BASE_DIR/datasets/skin/image_resized" "$BASE_DIR/datasets/skin/train_img"
 
-python ~/master-diploma/select_train_test.py "$BASE_DIR"
+python <code-root>/select_train_test.py "$BASE_DIR"
