@@ -3,10 +3,10 @@
 ## Prepare dataset before passing into pix2pix
 * At the first datasets must be downloaded, in this work we used [ISIC 2018 dataset](https://challenge.isic-archive.com/data/#2018)
 * You must download 3 datasets:
-  * Training data (10.4 G)
-  * Training Ground Truth (33 MB)
-  * Validation Data (228 MB)
-  * Validation Ground Truth (1 MB)
+  * Training data for tasks 1-2 (10.4 G)
+  * Training Ground Truth for task 1 (26 MB) & task 2 (33 MB)
+  * Validation Data for tasks 1-2 (228 MB)
+  * Validation Ground Truth for task 1 (742 KB) & task 2 (1 MB)
 * Create directory named `images`
 * Then unpack these zips into `images` directory
 * Out of the box already works baseline model, to support model with generated images pix2pix generator must be trained first
@@ -18,7 +18,14 @@
 ### Prepare dataset to train pix2pix network
 * to pass original images into pix2pix model it must be processed into the correseponded format
 * go to `dataset-to-pix2pix-data` folder
-* execute bash script with arguments: `DIR=<full-path-to-folders> resize-images.sh -a <relative-parth-to-attribute-dir> -s <relative-parth-to-segmentation-dir> -i <relative-parth-to-images-dir>`
+* modify `resize-images.sh` by replacing `<code-root>` with the __absolute__ path to the root of this repository
+* execute bash script with arguments: 
+  ```
+  $ chmode +x resize-images.sh
+  $ DIR=<data-root> ./resize-images.sh -a ISIC2018_Task2_Training_GroundTruth_v3 -s ISIC2018_Task1_Training_GroundTruth -i ISIC2018_Task1-2_Training_Input
+  ```
+
+  where `<data-root>` is __absolute__ path of the folder `images`
 
 ### Train pix2pix network
 * `cd pix2pixHD` -- go to the GAN directory
