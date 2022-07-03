@@ -18,7 +18,9 @@
 ### Prepare dataset to train pix2pix network
 * to pass original images into pix2pix model it must be processed into the correseponded format
 * go to `dataset-to-pix2pix-data` folder
-* modify `resize-images.sh` by replacing `<code-root>` with the __absolute__ path to the root of this repository
+* modify the 3rd line of `resize-images.sh` by filling in the __absolute__ path to the root of this repository
+
+  E.g. `REPO_DIR=~/master-diploma` if this repository is located at `~/master-diploma`
 * execute bash script with arguments: 
   ```
   $ chmode +x resize-images.sh
