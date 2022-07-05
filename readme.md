@@ -23,7 +23,7 @@
   E.g. `REPO_DIR="~/master-diploma"` if this repository is located at `~/master-diploma`
 * execute bash script with arguments: 
   ```
-  $ chmode +x resize-images.sh
+  $ chmod +x resize-images.sh
   $ DIR=<data-root> ./resize-images.sh -a ISIC2018_Task2_Training_GroundTruth_v3 -s ISIC2018_Task1_Training_GroundTruth -i ISIC2018_Task1-2_Training_Input
   ```
 
@@ -49,7 +49,7 @@
   All script arguments have the same meaning as in the command above
 * After training the GAN, synthesize images 
   ```
-  $ python3 test.py --name <experiment-name> --dataroot <data_root>/datasets/skin --checkpoints_dir <directory-to-store-temporary-results> --label_nc 8 --how_many 10000 --gpu_id  <gpu-id> --results_dir images/pix2pix_result/
+  $ python test.py --name <experiment-name> --dataroot <data_root>/datasets/skin --checkpoints_dir <directory-to-store-temporary-results> --label_nc 8 --how_many 10000 --gpu_id  <gpu-id> --results_dir images/pix2pix_result/
   ```
 
   All script arguments have the same meaning as in the command above
@@ -72,6 +72,29 @@
 
 ### Train classification model
 Model based on InceptionV4 network
-* `cd classificator_network` -- go to the classificator directory
-* `pythob train.py --train_root <full-path-to-train-images-folder> --train_csv <full-path-to-train-csv-image> --validate_root <full-path-to-validate-images-folder> --validate_csv <full-path-to-validate-csv-image> --epochs <epochs-count> --result_dir <base-result-directory> --experiment_name <launch-name>` -- execute this code
-* after train you'll receive json file with metrics, which contains accuracy, f1 measure, AUC
+* go to the classificator directory `$ cd classificator_network`
+* run trainig classifier
+  ```
+  $ python train.py --train_root <data-root-parent> --train_csv <full-path-to-train-csv-image> --validate_root <data-root-parent> --validate_csv <full-path-to-validate-csv-image>  --result_dir <base-result-directory> --experiment_name <launch-name> --epochs 100 --num_workers 0 --batch_size 32 --learning_rate 0.001
+  ```
+
+  where
+  * `<data-root-parent>` is __absolute__ path of the folder parent folder of `images` folder
+  * `<full-path-to-train-csv-image>` is __absolute__ path of the csv with train data
+  * `<full-path-to-validate-csv-image>` is __absolute__ path of the csv with test data
+  * `<base-result-directory>` is relative or absolute path of the folder where results will be stored inside
+  * `<launch-name>` is experiment name
+
+  Note
+  1. results will be saved as a json file with metrics, which contains accuracy, f1 measure, AUC values under `<base-result-directory>/<launch-name>`
+  2. final model will be saved under `<base-result-directory>/<launch-name>/last_model.pth`
+  
+  Different running options
+  * to run with Bissoto et al.'s train-test split use
+    * `<full-path-to-train-csv-image>`=`<repo-root>/splits/baseline_bussio/train_<i>.csv`, where `<i>` is the number of run = 0..9
+    * `<full-path-to-validate-csv-image>`=`<repo-root>/splits/validation_skin_lesion.csv`
+  * to run with original train-test split use
+    * `<full-path-to-train-csv-image>`=`<repo-root>/splits/baseline/train_<i>.csv`, where `<i>` is the number of run = 0..9
+    * `<full-path-to-validate-csv-image>`=`<repo-root>/splits/validation.csv`
+  
+  where `<repo-root>` is __absolute__ path of the root of this repository
