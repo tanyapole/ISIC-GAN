@@ -68,10 +68,9 @@ def data_to_csv(real_prefix: str,
 
 
 if __name__ == "__main__":
-    #with open("/Users/nduginets/PycharmProjects/master-diploma/splits/skin_lesion_test.txt", "r") as f:
-    #    items_to_use = f.readlines()
-    #    items_to_use = list(map(lambda x: x[:-5], items_to_use))
-    items_to_use = []
+    with open("/Users/nduginets/PycharmProjects/master-diploma/splits/skin_lesion_test.txt", "r") as f:
+        items_to_use = f.readlines()
+        items_to_use = list(map(lambda x: x[:-5], items_to_use))
     ranges = [i for i in range(0, 10)]
 
     data_to_csv("images/ISIC2018_Task1-2_Training_Input",
