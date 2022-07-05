@@ -20,7 +20,7 @@
 * go to `dataset-to-pix2pix-data` folder
 * modify the 3rd line of `resize-images.sh` by filling in the __absolute__ path to the root of this repository
 
-  E.g. `REPO_DIR=~/master-diploma` if this repository is located at `~/master-diploma`
+  E.g. `REPO_DIR="~/master-diploma"` if this repository is located at `~/master-diploma`
 * execute bash script with arguments: 
   ```
   $ chmode +x resize-images.sh
