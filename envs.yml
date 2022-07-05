@@ -1,4 +1,4 @@
-name: with_torch
+name: ISIC_GAN
 channels:
   - alex-marty
   - pytorch
