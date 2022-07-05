@@ -13,7 +13,7 @@
 
 ### Prepare the environment
 * Install conda
-* Create conda env `conda env create -f envs.yml`
+* Create conda env `$ conda env create -f envs.yml`
 
 ### Prepare dataset to train pix2pix network
 * to pass original images into pix2pix model it must be processed into the correseponded format
@@ -30,11 +30,29 @@
   where `<data-root>` is __absolute__ path of the folder `images`
 
 ### Train pix2pix network
-* `cd pix2pixHD` -- go to the GAN directory
-* `python train.py --name <experiment-name> --dataroot <path-to-lesions-with-masks> --label_nc 8 --checkpoints_dir <directory-to-storage-temporary-results> --gpu_id <gpu-id> --batchSize 4` -- this command starts train
-* `python train.py --name <experiment-name> --dataroot <path-to-lesions-with-masks> --label_nc 8 --checkpoints_dir <directory-to-storage-temporary-results> --gpu_id <gpu-id> --batchSize 4 --continue_train` -- this command continues train
-* When the pix2pix model was trained, need to generate synthesized images 
-* `python3 test.py --name <experiment-name> --dataroot <path-to-lesions-with-masks> --checkpoints_dir <directory-to-storage-temporary-results> --label_nc 8 --how_many 10000 --gpu_id  <gpu-id> --results_dir images/pix2pix_result/` -- this script will create generated images
+* go to the GAN directory `$ cd pix2pixHD`
+* Start training a GAN
+  ```
+  $ python train.py --name <experiment-name> --dataroot <data_root>/datasets/skin --label_nc 8 --checkpoints_dir <directory-to-store-temporary-results> --gpu_id <gpu-id> --batchSize 4
+  ```
+
+  where 
+  * `<experiment-name>` is the name by which the trained model will be identified by other scripts
+  * `<data-root>` is __absolute__ path of the folder `images`
+  * `<directory-to-store-temporary-results>` is name of the directory that will be created by the script under `pix2pixHD` and where training metadata will be stored
+  * <gpu-id> is int number - the model will be trained on `cuda:<gpu-id>`
+* If needed, resume training a GAN
+  ```
+  $ python train.py --name <experiment-name> --dataroot <data_root>/datasets/skin --label_nc 8 --checkpoints_dir <directory-to-store-temporary-results> --gpu_id <gpu-id> --batchSize 4 --continue_train
+  ```
+
+  All script arguments have the same meaning as in the command above
+* After training the GAN, synthesize images 
+  ```
+  $ python3 test.py --name <experiment-name> --dataroot <data_root>/datasets/skin --checkpoints_dir <directory-to-store-temporary-results> --label_nc 8 --how_many 10000 --gpu_id  <gpu-id> --results_dir images/pix2pix_result/
+  ```
+
+  All script arguments have the same meaning as in the command above
 
 ### Augmentation techniques
 * At this step need to create fake images
