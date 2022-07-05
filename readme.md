@@ -75,7 +75,7 @@ Model based on InceptionV4 network
 * go to the classificator directory `$ cd classificator_network`
 * run trainig classifier
   ```
-  $ python train.py --train_root <data-root-parent> --train_csv <full-path-to-train-csv-image> --validate_root <data-root-parent> --validate_csv <full-path-to-validate-csv-image>  --result_dir <base-result-directory> --experiment_name <launch-name> --epochs 100 --num_workers 0 --batch_size 32 --learning_rate 0.001
+  $ python train.py --train_root <data-root-parent> --train_csv <full-path-to-train-csv-image> --validate_root <data-root-parent> --validate_csv <full-path-to-validate-csv-image>  --result_dir <base-result-directory> --experiment_name <launch-name> --epochs 100 --num_workers 0 --batch_size 32 --learning_rate 0.001 --gpu_id <gpu_id>
   ```
 
   where
@@ -84,6 +84,7 @@ Model based on InceptionV4 network
   * `<full-path-to-validate-csv-image>` is __absolute__ path of the csv with test data
   * `<base-result-directory>` is relative or absolute path of the folder where results will be stored inside
   * `<launch-name>` is experiment name
+  * `<gpu_id>` is the id of gpu for training the model
 
   Note
   1. results will be saved as a json file with metrics, which contains accuracy, f1 measure, AUC values under `<base-result-directory>/<launch-name>`
