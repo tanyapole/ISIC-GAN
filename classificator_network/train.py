@@ -273,7 +273,7 @@ def main(train_root, train_csv, val_root, val_csv, epochs: int, batch_size: int,
         if val_root is not None:
             logging.debug('val epoch {}/{}'.format(epoch + 1, epochs))
             train_epoch(
-                device, model, dataloaders, metric_holder, criterion, optimizer, 'val',
+                device, model, dataloaders, metric_holder, criterion, None, 'val',
                 epoch, epochs,
                 labels,
                 batches_per_epoch)
