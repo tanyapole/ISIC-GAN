@@ -1,6 +1,12 @@
 # How to build and train
+
+## Prepare the environment
+* Install conda
+* Create conda env `$ conda env create -f envs.yml`
+
+## Prepare Data
  
-## Prepare dataset before passing into pix2pix
+### Download original dataset
 * At the first datasets must be downloaded, in this work we used [ISIC 2018 dataset](https://challenge.isic-archive.com/data/#2018)
 * You must download 3 datasets:
   * Training data for tasks 1-2 (10.4 G)
@@ -11,23 +17,33 @@
 * Then unpack these zips into `images` directory
 * Out of the box already works baseline model, to support model with generated images pix2pix generator must be trained first
 
-### Prepare the environment
-* Install conda
-* Create conda env `$ conda env create -f envs.yml`
-
-### Prepare dataset to train pix2pix network
-* to pass original images into pix2pix model it must be processed into the correseponded format
+### Prepare dataset for GAN
 * go to `dataset-to-pix2pix-data` folder
 * modify the 3rd line of `resize-images.sh` by filling in the __absolute__ path to the root of this repository
 
   E.g. `REPO_DIR="~/master-diploma"` if this repository is located at `~/master-diploma`
-* execute bash script with arguments: 
+* execute bash script with arguments:
   ```
   $ chmod +x resize-images.sh
   $ DIR=<data-root> ./resize-images.sh -a ISIC2018_Task2_Training_GroundTruth_v3 -s ISIC2018_Task1_Training_GroundTruth -i ISIC2018_Task1-2_Training_Input
   ```
 
   where `<data-root>` is __absolute__ path of the folder `images`
+
+### Prepare bounding boxes for GAN
+* go to `bounding_boxes` folder
+* modify the 3rd line of `resize-images.sh` by filling in the __absolute__ path to the root of this repository
+
+  E.g. `REPO_DIR="~/master-diploma"` if this repository is located at `~/master-diploma`
+* execute bash script with arguments: 
+  ```
+  $ chmod +x process_images.sh
+  $ DIR=<data-root> ./process_images.sh -a ISIC2018_Task2_Training_GroundTruth_v3 -s ISIC2018_Task1_Training_GroundTruth -i ISIC2018_Task1-2_Training_Input
+  ```
+
+  where `<data-root>` is __absolute__ path of the folder `images`
+
+## Train GAN
 
 ### Train pix2pix network
 * go to the GAN directory `$ cd pix2pixHD`
@@ -64,6 +80,7 @@
 * at the end you'll get set of folders with different strategies to train and execute
 
 
+## Train classification model
 ### Prepare data to pass into classification model
 * I already split datasets
 * use `splits` folder to train model with usual data
