@@ -123,18 +123,23 @@ def train_epoch(device, model, dataloaders, metric_holder, criterion, optimizer,
         result_cell[label_name]['cm'] = cm.tolist()
         result_cell[label_name]['f1_binary'] = f1_score(real, predicted)
 
+    # F1 micro
     real = np.array([])
     predicted = np.array([])
     for idx, label_name in enumerate(label_names):
         real_ = np.array(labels_by_classes[label_name])
         predicted_ = np.array(predicted_by_classes[label_name])
-        real = np.concatenate((real, real_ * (idx + 1)))
-        predicted = np.concatenate((predicted, predicted_ * (idx + 1)))
+        real = np.concatenate((real, real_))
+        predicted = np.concatenate((predicted, predicted_))
+    result_cell['f1_micro'] = f1_score(real, predicted, average='binary')
 
+    # F1 macro
+    f1s = [result_cell[label_name]['f1_binary'] for label_name in label_names]
+    result_cell['f1_macro'] = np.array(f1s).mean()
+
+    # loss and accuracy
     result_cell['loss'] = losses.avg
     result_cell['accuracy'] = accuracies.avg
-    result_cell['f1_micro'] = f1_score(real, predicted, average='micro')
-    result_cell['f1_macro'] = f1_score(real, predicted, average='macro')
     meters.add_record(epoch_number, result_cell)
 
 
