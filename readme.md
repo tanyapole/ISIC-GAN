@@ -121,3 +121,14 @@ Model based on InceptionV4 network
     * `<full-path-to-validate-csv-image>`=`<repo-root>/splits/validation.csv`
   
   where `<repo-root>` is __absolute__ path of the root of this repository
+
+## Utility files
+* generated data splits creation
+  ```
+  $ cd bounding_boxes
+  $ python create_generated_split.py --data-root <data-root> --generated-data-folder <generated-data-folder> --ratios 0.2 0.5 0.8 1.0 --seeds 0 1 2 3 4 5 7 8 9
+  ```
+
+  where
+  <data-root> is __absolute__ path of the `images` folder
+  <generated-data-folder> is __absolute__ path to the folder that contains generated images
