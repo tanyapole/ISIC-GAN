@@ -66,7 +66,7 @@
   All script arguments have the same meaning as in the command above
 * After training the GAN, synthesize images 
   ```
-  $ python test.py --name <experiment-name> --dataroot <data_root>/datasets/skin --checkpoints_dir <directory-to-store-temporary-results> --label_nc 8 --how_many 10000 --gpu_id  <gpu-id> --results_dir <data_root>/pix2pix_result/
+  $ python test.py --name <experiment-name> --dataroot <data_root>/datasets/skin --checkpoints_dir <directory-to-store-temporary-results> --label_nc 8 --how_many 10000 --gpu_id  <gpu-id> --results_dir <data_root>/pix2pix_result/ --phase train
   ```
 
   where 
