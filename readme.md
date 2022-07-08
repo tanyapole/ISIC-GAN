@@ -62,13 +62,18 @@
   $ python train.py --name <experiment-name> --dataroot <data_root>/datasets/skin --label_nc 8 --checkpoints_dir <directory-to-store-temporary-results> --gpu_id <gpu-id> --batchSize 4 --continue_train
   ```
 
+### Synthesize new images
   All script arguments have the same meaning as in the command above
 * After training the GAN, synthesize images 
   ```
-  $ python test.py --name <experiment-name> --dataroot <data_root>/datasets/skin --checkpoints_dir <directory-to-store-temporary-results> --label_nc 8 --how_many 10000 --gpu_id  <gpu-id> --results_dir images/pix2pix_result/
+  $ python test.py --name <experiment-name> --dataroot <data_root>/datasets/skin --checkpoints_dir <directory-to-store-temporary-results> --label_nc 8 --how_many 10000 --gpu_id  <gpu-id> --results_dir <data_root>/pix2pix_result/
   ```
 
-  All script arguments have the same meaning as in the command above
+  where 
+  * `<experiment-name>` is the same as in training the GAN
+  * `<data-root>` is __absolute__ path of the folder `images`
+  * `<directory-to-store-temporary-results>` is the same as in training the GAN
+  * <gpu-id> is int number - image synthesis will be performed on `cuda:<gpu-id>`
 
 ### Augmentation techniques
 * At this step need to create fake images
