@@ -119,4 +119,4 @@ mv "$BASE_DIR/datasets/skin/semantic_map" "$BASE_DIR/datasets/skin/train_label"
 mv "$BASE_DIR/image_resized" "$BASE_DIR/datasets/skin/"
 mv "$BASE_DIR/datasets/skin/image_resized" "$BASE_DIR/datasets/skin/train_img"
 
-python ${REPO_DIR}/select_train_test.py "$BASE_DIR"
+python ${REPO_DIR}/select_train_test.py "$BASE_DIR/datasets/skin"

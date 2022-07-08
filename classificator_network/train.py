@@ -123,18 +123,23 @@ def train_epoch(device, model, dataloaders, metric_holder, criterion, optimizer,
         result_cell[label_name]['cm'] = cm.tolist()
         result_cell[label_name]['f1_binary'] = f1_score(real, predicted)
 
+    # F1 micro
     real = np.array([])
     predicted = np.array([])
     for idx, label_name in enumerate(label_names):
         real_ = np.array(labels_by_classes[label_name])
         predicted_ = np.array(predicted_by_classes[label_name])
-        real = np.concatenate((real, real_ * (idx + 1)))
-        predicted = np.concatenate((predicted, predicted_ * (idx + 1)))
+        real = np.concatenate((real, real_))
+        predicted = np.concatenate((predicted, predicted_))
+    result_cell['f1_micro'] = f1_score(real, predicted, average='binary')
 
+    # F1 macro
+    f1s = [result_cell[label_name]['f1_binary'] for label_name in label_names]
+    result_cell['f1_macro'] = np.array(f1s).mean()
+
+    # loss and accuracy
     result_cell['loss'] = losses.avg
     result_cell['accuracy'] = accuracies.avg
-    result_cell['f1_micro'] = f1_score(real, predicted, average='micro')
-    result_cell['f1_macro'] = f1_score(real, predicted, average='macro')
     meters.add_record(epoch_number, result_cell)
 
 
@@ -146,7 +151,7 @@ def save_images(dataset, to, n=32):
 
 def main(train_root, train_csv, val_root, val_csv, epochs: int, batch_size: int,
          num_workers,
-         lr, experiment_path, experiment_name, start_from_begin, csv_image_field="images", n_classes=5):
+         lr, experiment_path, experiment_name, start_from_begin, gpu_id, csv_image_field="images", n_classes=5):
     last_model_path = os.path.join(experiment_path, "last_model.pth")
     train_metrics = utils.Dumper(os.path.join(experiment_path, "train_metrics.json"))
     test_metrics = utils.Dumper(os.path.join(experiment_path, "test_metrics.json"))
@@ -155,7 +160,12 @@ def main(train_root, train_csv, val_root, val_csv, epochs: int, batch_size: int,
         'val': test_metrics
     }
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    if gpu_id is not None:
+        if not torch.cuda.is_available(): 
+            raise Exception(f"no cuda available. Can't run on gpu {gpu_id}")
+        device = torch.device(f"cuda:{gpu_id}")
+    else:
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     model = ptm.inceptionv4(num_classes=1000, pretrained='imagenet')
     model.last_linear = nn.Linear(model.last_linear.in_features, n_classes)
@@ -268,7 +278,7 @@ def main(train_root, train_csv, val_root, val_csv, epochs: int, batch_size: int,
         if val_root is not None:
             logging.debug('val epoch {}/{}'.format(epoch + 1, epochs))
             train_epoch(
-                device, model, dataloaders, metric_holder, criterion, optimizer, 'val',
+                device, model, dataloaders, metric_holder, criterion, None, 'val',
                 epoch, epochs,
                 labels,
                 batches_per_epoch)
@@ -298,14 +308,15 @@ if __name__ == "__main__":
 
     ex_path = os.path.join(params.result_dir, params.experiment_name)
     main(
-        params.train_root,
-        params.train_csv,
-        params.validate_root,
-        params.validate_csv,
-        params.epochs,
-        params.batch_size,
-        params.num_workers,
-        params.learning_rate,
-        ex_path,
-        params.experiment_name,
-        params.start_from_begin)
+        train_root=params.train_root, 
+        train_csv=params.train_csv,
+        val_root=params.validate_root,
+        val_csv=params.validate_csv,
+        epochs=params.epochs,
+        batch_size=params.batch_size,
+        num_workers=params.num_workers,
+        lr=params.learning_rate,
+        experiment_path=ex_path,
+        experiment_name=params.experiment_name,
+        start_from_begin=params.start_from_begin,
+        gpu_id=params.gpu_id)

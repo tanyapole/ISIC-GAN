@@ -23,6 +23,8 @@ parser.add_argument("--experiment_name", help="experiment name where all will be
 
 parser.add_argument("--start_from_begin", type=bool, help="indicate start train from first epoch", default=True)
 
+parser.add_argument("--gpu_id", type=int, help="id of gpu to use", default=None)
+
 
 def __parse_and_get(args=None):
     return parser.parse_args(args)
