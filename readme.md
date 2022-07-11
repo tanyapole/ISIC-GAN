@@ -126,7 +126,7 @@ Model based on InceptionV4 network
 * generated data splits creation
   ```
   $ cd bounding_boxes
-  $ python create_generated_split.py --data-root <data-root> --generated-data-folder <generated-data-folder> --ratios 0.2 0.5 0.8 1.0 --seeds 0 1 2 3 4 5 7 8 9
+  $ python create_generated_split.py --data-root <data-root> --generated-data-folder <generated-data-folder> --ratios 0.2 0.5 0.8 1.0 --seeds 0 1 2 3 4 5 6 7 8 9
   ```
 
   where
