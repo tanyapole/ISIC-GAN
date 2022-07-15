@@ -162,7 +162,7 @@ def _get_cmd_args():
     parser = argparse.ArgumentParser('Classification HP search')
     parser.add_argument('--batch_size', type=int, default=64)
     parser.add_argument('--cuda_idx', type=int, required=True)
-    parser.add_argument('--model', type=str, choices=['resnet50', 'resnext50_32x4d', 'inceptionv4'], required=True)
+    parser.add_argument('--model', type=str, choices=['resnet50', 'resnext50_32x4d', 'resnet34'], required=True)
     parser.add_argument('--lr', type=float, required=True)
     parser.add_argument('--num_epochs', type=int, default=300)
     parser.add_argument('--image_size', type=int, default=384)
