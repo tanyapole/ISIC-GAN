@@ -6,7 +6,7 @@
 1. pad all inputs to 1024x512 by calling [script](pad.sh)
 1. prepare dataset for Pix2PixHD `$ python split.py`
 
-
+# Cut synthesiszed images
 To cut synthesised images `$python cut.py --source <fldr-with-synthesized_imgs> --target <target-fldr>`
 
 # Bboxes
