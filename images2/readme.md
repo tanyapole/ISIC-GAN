@@ -9,6 +9,9 @@
 # Cut synthesiszed images
 To cut synthesised images `$python cut.py --source <fldr-with-synthesized_imgs> --target <target-fldr>`
 
+# Save augmented masks
+`$ python save_augmented_masks.py`
+
 # Bboxes
 1. to create bboxes for resized images run from repo root `$python show_bboxes.py`
 1. go to this folder `$ cd images2`
