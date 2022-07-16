@@ -5,24 +5,19 @@ import os
 import numpy as np
 from pathlib import Path
 import torch
-from tqdm.auto import tqdm
 import torchvision.transforms.functional as TFF
 import torchvision.transforms as TF
 from PIL import Image
-import torchvision.models
 import torch.nn as nn
-import pretrainedmodels as ptm
 import wandb
-import sklearn.metrics
 import segmentation_models_pytorch as smp
 import imgaug.augmenters as iaa
 from imgaug.augmentables.segmaps import SegmentationMapsOnImage
-
+from tqdm.auto import tqdm
 
 ATTRIBUTES = ['globules', 'milia_like_cyst', 'negative_network', 'pigment_network', 'streaks']
 
 def create_model(name):
-    num_classes = len(ATTRIBUTES)
     return smp.Unet(name, encoder_weights='imagenet', classes=len(ATTRIBUTES))
 
 def create_optimizer(model, lr):
@@ -104,13 +99,15 @@ def main(args):
     optimizer = create_optimizer(model, args.lr)
     loss_fn = nn.BCEWithLogitsLoss()
 
-    run = wandb.init(project='ISIC-GAN-segm-HP-search', config=args.__dict__)
+    run = wandb.init(project='ISIC-GAN-segm-HP-search', config=args.__dict__, tags=args.tags)
 
-    for epoch in tqdm(list(range(args.num_epochs)), desc='Epoch'):
+    for epoch in range(args.num_epochs):
+        print(f'Epoch {epoch}')
+
         # train
         model.train()
         trn_losses = Collector()
-        for img, lbl in tqdm(trn_dl, desc='Train', leave=False):
+        for img, lbl in trn_dl:
             optimizer.zero_grad()
             out = model(img.cuda())
             loss = loss_fn(out, lbl.cuda())
@@ -122,7 +119,7 @@ def main(args):
         model.eval()
         intersections, unions, val_losses = Collector(), Collector(), Collector()
         with torch.no_grad():
-            for img, lbl in tqdm(val_dl, desc='Valid', leave=False):
+            for img, lbl in val_dl:
                 out = model(img.cuda())
                 loss = loss_fn(out, lbl.cuda())
                 val_losses.put(loss)
@@ -158,7 +155,7 @@ def _get_debug_args():
     args.val_csv_path = '../splits/small.csv' # '../splits/validation_skin_lesion.csv'
     return args
 
-def _get_cmd_args():
+def get_parser():
     parser = argparse.ArgumentParser('Classification HP search')
     parser.add_argument('--batch_size', type=int, default=64)
     parser.add_argument('--cuda_idx', type=int, required=True)
@@ -169,10 +166,11 @@ def _get_cmd_args():
     parser.add_argument('--repo_fldr', type=str, required=True)
     parser.add_argument('--trn_csv_path', type=str, required=True)
     parser.add_argument('--val_csv_path', type=str, required=True)
-    return parser.parse_args()
+    parser.add_argument('--tags', type=str, nargs='+')
+    return parser
 
 if __name__ == '__main__':
-    args = _get_cmd_args()
+    args = get_parser().parse_args()
     print(args)
     os.environ["CUDA_VISIBLE_DEVICES"] = str(args.cuda_idx)
     os.environ["WANDB_SILENT"] = "True"
