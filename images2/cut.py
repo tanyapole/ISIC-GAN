@@ -23,7 +23,7 @@ def main(synthesized_fldr, target_fldr):
     target_fldr.mkdir(exist_ok=False, parents=True)
 
     for filepath in tqdm(list(synthesized_fldr.iterdir())):
-        if filepath.name.endswith('_semantic_synthesized_image.png'):
+        if filepath.name.endswith('_synthesized_image.png'):
             ID = get_ID(filepath)
             original_path = before_pad_fldr / f'{ID}.png'
             original_shape = np.array(Image.open(original_path)).shape
