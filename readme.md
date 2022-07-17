@@ -62,13 +62,18 @@
   $ python train.py --name <experiment-name> --dataroot <data_root>/datasets/skin --label_nc 8 --checkpoints_dir <directory-to-store-temporary-results> --gpu_id <gpu-id> --batchSize 4 --continue_train
   ```
 
+### Synthesize new images
   All script arguments have the same meaning as in the command above
 * After training the GAN, synthesize images 
   ```
-  $ python test.py --name <experiment-name> --dataroot <data_root>/datasets/skin --checkpoints_dir <directory-to-store-temporary-results> --label_nc 8 --how_many 10000 --gpu_id  <gpu-id> --results_dir images/pix2pix_result/
+  $ python test.py --name <experiment-name> --dataroot <data_root>/datasets/skin --checkpoints_dir <directory-to-store-temporary-results> --label_nc 8 --how_many 10000 --gpu_id  <gpu-id> --results_dir <data_root>/pix2pix_result/ --phase train
   ```
 
-  All script arguments have the same meaning as in the command above
+  where 
+  * `<experiment-name>` is the same as in training the GAN
+  * `<data-root>` is __absolute__ path of the folder `images`
+  * `<directory-to-store-temporary-results>` is the same as in training the GAN
+  * <gpu-id> is int number - image synthesis will be performed on `cuda:<gpu-id>`
 
 ### Augmentation techniques
 * At this step need to create fake images
@@ -116,3 +121,14 @@ Model based on InceptionV4 network
     * `<full-path-to-validate-csv-image>`=`<repo-root>/splits/validation.csv`
   
   where `<repo-root>` is __absolute__ path of the root of this repository
+
+## Utility files
+* generated data splits creation
+  ```
+  $ cd bounding_boxes
+  $ python create_generated_split.py --data-root <data-root> --generated-data-folder <generated-data-folder> --ratios 0.2 0.5 0.8 1.0 --seeds 0 1 2 3 4 5 6 7 8 9
+  ```
+
+  where
+  <data-root> is __absolute__ path of the `images` folder
+  <generated-data-folder> is __absolute__ path to the folder that contains generated images

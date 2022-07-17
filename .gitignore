@@ -1,5 +1,8 @@
 # This repo
 images/
+images2/*/
+pix2pixHD/tmp/
+classification_network/tmp/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
