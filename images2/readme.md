@@ -13,7 +13,8 @@ To cut synthesised images `$python cut.py --source <fldr-with-synthesized_imgs> 
 `$ python save_augmented_masks.py`
 
 # Bboxes
-1. to create bboxes for resized images run from repo root `$python show_bboxes.py`
+1. to view bboxes on top of derm attributes contours run from repo root `$python show_bboxes.py`
+1. to create bboxes for resized images run from repo root `$python build_bboxes.py`
 1. go to this folder `$ cd images2`
 1. combine masks into conditions `$ python combine_masks.py --bbox`
 1. pad all inputs to 1024x512 by calling [script](pad_bboxes.sh)
