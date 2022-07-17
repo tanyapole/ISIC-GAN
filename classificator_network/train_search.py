@@ -100,7 +100,7 @@ def main(args):
     optimizer = create_optimizer(model, args.lr)
     loss_fn = nn.BCEWithLogitsLoss()
 
-    run = wandb.init(project='ISIC-GAN-cl-HP-search', config=args.__dict__)
+    run = wandb.init(project='ISIC-GAN-cl-HP-search', config=args.__dict__, tags=args.tags)
 
     for epoch in tqdm(list(range(args.num_epochs)), desc='Epoch'):
         # train
@@ -165,6 +165,7 @@ def _get_cmd_args():
     parser.add_argument('--repo_fldr', type=str, required=True)
     parser.add_argument('--trn_csv_path', type=str, required=True)
     parser.add_argument('--val_csv_path', type=str, required=True)
+    parser.add_argument('--tags', type=str, nargs='+')
     return parser.parse_args()
 
 if __name__ == '__main__':
